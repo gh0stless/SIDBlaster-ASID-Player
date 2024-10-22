@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="TIT5TR" name="SIDBlaster ASID Player" projectType="guiapp"
+              useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
+              companyName="crazy-midi.de" companyWebsite="www.crazy-midi.de"
+              companyEmail="info@crazy-midi.de">
+  <MAINGROUP id="iRcPnY" name="SIDBlaster ASID Player">
+    <GROUP id="{B2ADDEAA-F2C0-E353-BBC5-F5219FB38A7C}" name="Source">
+      <FILE id="ZsBLoi" name="CrazyMidi_grau_64x64.png" compile="0" resource="1"
+            file="Source/CrazyMidi_grau_64x64.png"/>
+      <FILE id="aLzSp3" name="CrazyMidi_grau.png" compile="0" resource="1"
+            file="Source/CrazyMidi_grau.png"/>
+      <FILE id="iIhDfD" name="Hintergrund.png" compile="0" resource="1" file="Source/Hintergrund.png"/>
+      <FILE id="VeFWan" name="hardsid.h" compile="0" resource="0" file="Source/hardsid.h"/>
+      <FILE id="Owf7lP" name="LedIndicator.h" compile="0" resource="0" file="Source/LedIndicator.h"/>
+      <FILE id="K4Qj5F" name="Sid.h" compile="0" resource="0" file="Source/Sid.h"/>
+      <FILE id="h4U655" name="Sid.cpp" compile="1" resource="0" file="Source/Sid.cpp"/>
+      <FILE id="qc36P6" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="F9mfKH" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="R99mKV" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+    </GROUP>
+    <FILE id="TNa5Zg" name="asid_protocol.txt" compile="0" resource="1"
+          file="docs/asid_protocol.txt"/>
+    <FILE id="jdL8BC" name="hardsid.dll how to and hints.txt" compile="0"
+          resource="1" file="docs/hardsid.dll how to and hints.txt"/>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
+  <EXPORTFORMATS>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster ASID Player"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="SIDBlaster ASID Player"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../../../Frameworks/JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <VS2022 targetFolder="Builds/VisualStudio2022" externalLibraries="..\..\libs\hardsid.lib"
+            extraLinkerFlags="&#10;" bigIcon="aLzSp3" smallIcon="ZsBLoi"
+            windowsTargetPlatformVersion="10.0.20348.0">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="0" name="Release" targetName="SIDBlaster ASID Player"
+                       useRuntimeLibDLL="1"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster ASID Player"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../../../Frameworks/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2022>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster ASID Player"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="SIDBlaster ASID Player"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../../../Frameworks/JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+  </EXPORTFORMATS>
+</JUCERPROJECT>
