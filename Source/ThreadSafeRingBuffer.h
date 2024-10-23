@@ -1,13 +1,5 @@
-/*
-  ==============================================================================
-
-    ThreadSafeRingBuffer.h
-    Created: 22 Oct 2024 8:09:34am
-    Author:  andre
-
-  ==============================================================================
-*/
 #pragma once
+#include <atomic>
 #include <JuceHeader.h>
 
 template <typename T>
@@ -22,55 +14,55 @@ public:
         delete[] buffer;  // Speicher freigeben
     }
 
-    void add(T value) {
-        juce::ScopedLock lock(mutex); // Thread-sicherer Zugriff
+    // Add a new value to the ring buffer
+    void add(const T& value) {
+        buffer[head.load()] = value;  // Schreibe den Wert in das Puffer-Array
+        auto nextHead = (head.load() + 1) % maxSize;
 
-        buffer[head] = value;
-        head = (head + 1) % maxSize;
-
-        if (isFull) {
-            // Überschreibt das älteste Element
-            tail = (tail + 1) % maxSize;
+        if (nextHead == tail.load()) {  // Puffer ist voll, schiebe den Tail-Zeiger weiter
+            tail.store((tail.load() + 1) % maxSize);
+            isFull.store(true);
         }
 
-        isFull = (head == tail);
+        head.store(nextHead);
     }
 
+    // Remove an item from the ring buffer
     bool remove(T& value) {
-        juce::ScopedLock lock(mutex); // Thread-sicherer Zugriff
         if (isEmpty()) {
             return false;
         }
 
-        value = buffer[tail];
-        tail = (tail + 1) % maxSize;
-        isFull = false;
+        value = buffer[tail.load()];
+        tail.store((tail.load() + 1) % maxSize);
+        isFull.store(false);
 
         return true;
     }
 
+    // Check if the buffer is empty
     bool isEmpty() const {
-        return (!isFull && (head == tail));
+        return (!isFull.load() && (head.load() == tail.load()));
     }
 
+    // Get the current size of the buffer
     int size() const {
-        if (isFull) {
+        if (isFull.load()) {
             return maxSize;
         }
 
-        if (head >= tail) {
-            return head - tail;
+        if (head.load() >= tail.load()) {
+            return head.load() - tail.load();
         }
         else {
-            return maxSize + head - tail;
+            return maxSize + head.load() - tail.load();
         }
     }
 
 private:
-    T* buffer;               // C-Array für den Puffer
-    size_t maxSize;           // Maximale Größe des Puffers
-    size_t head;              // Kopfzeiger
-    size_t tail;              // Schwanzzeiger
-    bool isFull;              // Status, ob der Puffer voll ist
-    juce::CriticalSection mutex;  // Synchronisation für Thread-Sicherheit
+    T* buffer;  // C-Array für den Puffer
+    const size_t maxSize;  // Maximale Größe des Puffers
+    std::atomic<size_t> head;  // Kopfzeiger, atomic für Thread-Sicherheit
+    std::atomic<size_t> tail;  // Schwanzzeiger, atomic für Thread-Sicherheit
+    std::atomic<bool> isFull;  // Status, ob der Puffer voll ist, atomic für Thread-Sicherheit
 };

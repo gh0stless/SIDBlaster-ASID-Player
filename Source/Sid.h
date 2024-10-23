@@ -9,12 +9,10 @@
 */
 
 #pragma once
-#if defined(_WIN32) || defined(_WIN64)
-#include <Windows.h>
-#endif
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "./hardsid.h"
+
 struct WriteSet {
 	Uint8 SIDRegister;
 	Uint8 SIDData;
@@ -34,8 +32,6 @@ struct WriteSet {
 #include "ThreadSafeRingBuffer.h"
 #include "SIDWriteThread.h"
 
-
-
 #define MY_BUFFER_SIZE 10000
 
 typedef unsigned char Uint8;
@@ -45,8 +41,6 @@ typedef unsigned char  BYTE;
 enum SID_TYPE {
 	SID_TYPE_NONE = 0, SID_TYPE_6581, SID_TYPE_8580
 };
-
-
 
 class Sid {
 	public:
@@ -65,10 +59,10 @@ class Sid {
 	private:	
 		juce::DynamicLibrary hardsidlibrary;
 		
-		ThreadSafeRingBuffer<WriteSet> ringBuffer0; // Der gemeinsame Ringpuffer
-		ThreadSafeRingBuffer<WriteSet> ringBuffer1; // Der gemeinsame Ringpuffer
-		ThreadSafeRingBuffer<WriteSet> ringBuffer2; // Der gemeinsame Ringpuffer
-		SIDWriteThread consumerThread0;        // Der Verbraucherthread
-		SIDWriteThread consumerThread1;        // Der Verbraucherthread
-		SIDWriteThread consumerThread2;        // Der Verbraucherthread
+		ThreadSafeRingBuffer<WriteSet> ringBuffer0; 
+		ThreadSafeRingBuffer<WriteSet> ringBuffer1; 
+		ThreadSafeRingBuffer<WriteSet> ringBuffer2; 
+		SIDWriteThread consumerThread0;      
+		SIDWriteThread consumerThread1;     
+		SIDWriteThread consumerThread2;        
 };
