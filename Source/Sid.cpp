@@ -17,9 +17,8 @@
 Sid::Sid()	:	ringBuffer0(MY_BUFFER_SIZE),
 				ringBuffer1(MY_BUFFER_SIZE),
 				ringBuffer2(MY_BUFFER_SIZE),
-				consumerThread0(ringBuffer0,0), 
-				consumerThread1(ringBuffer1,1), 
-				consumerThread2(ringBuffer2,2)  
+				consumerThread(ringBuffer0, ringBuffer1, ringBuffer2,Number_Of_Devices)
+
 	{
 		Number_Of_Devices = (int)HardSID_Devices();
 		if (Number_Of_Devices == 0) {
@@ -68,44 +67,19 @@ Sid::~Sid() {
 			break;
 		}
 	}
-	void Sid::startConsumer(int WriteThreadNo) {
-		switch (WriteThreadNo) {
-		case 0:
-			if (!consumerThread0.isThreadRunning()) {
-				consumerThread0.startThread();
+	void Sid::startConsumer(void) {
+		
+		
+			if (!consumerThread.isThreadRunning()) {
+				consumerThread.startThread();
 			}
-			break;
-		case 1:
-			if (!consumerThread1.isThreadRunning()) {
-				consumerThread1.startThread();
-			}
-			break;
-		case 2:
-			if (!consumerThread2.isThreadRunning()) {
-				consumerThread2.startThread();
-			}
-			break;
-		}
+		
 	}
-	void Sid::stopConsumer(int WriteThreadNo) {
-		switch (WriteThreadNo) {
-		case 0:
-			if (consumerThread0.isThreadRunning()) {
-				consumerThread0.signalThreadShouldExit();
-				consumerThread0.waitForThreadToExit(1000);
+	void Sid::stopConsumer(void) {
+	
+			if (consumerThread.isThreadRunning()) {
+				consumerThread.signalThreadShouldExit();
+				consumerThread.waitForThreadToExit(1000);
 			}
-			break;
-		case 1:
-			if (consumerThread1.isThreadRunning()) {
-				consumerThread1.signalThreadShouldExit();
-				consumerThread1.waitForThreadToExit(1000);
-			}
-			break;
-		case 2:
-			if (consumerThread2.isThreadRunning()) {
-				consumerThread2.signalThreadShouldExit();
-				consumerThread2.waitForThreadToExit(1000);
-			}
-			break;
-		}
+	
 	}

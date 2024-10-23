@@ -60,7 +60,7 @@ MainComponent::MainComponent()
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
     }
     else {
-        if (sid->Number_Of_Devices>1) sid->Number_Of_Devices=1;
+        //if (sid->Number_Of_Devices>1) sid->Number_Of_Devices=1;
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
             sid->init(i);
             
@@ -144,18 +144,18 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
                         if ((data[1] == 80) && (sid->Number_Of_Devices > 1)) {
                             if (!Msg2Mem) {
                                 outputTextBox.insertTextAtCaret("2SID Data recived\n");
-                                //sid->startConsumer(1);
+                                sid->startConsumer(1);
                                 Msg2Mem = true;
                             }
-                            //sid->push_event(1, address, register_value);
+                            sid->push_event(1, address, register_value);
                         }
                         if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
                             if (!Msg3Mem) {
                                 outputTextBox.insertTextAtCaret("3SID Data recived\n");
-                                //sid->startConsumer(2);
+                                sid->startConsumer(2);
                                 Msg3Mem = true;
                             }
-                            //sid->push_event(2, address, register_value);
+                            sid->push_event(2, address, register_value);
                         }
                         reg++;
                     }

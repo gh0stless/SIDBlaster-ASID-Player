@@ -16,7 +16,6 @@
 struct WriteSet {
 	Uint8 SIDRegister;
 	Uint8 SIDData;
-
 };
 
 #define NUMSIDREGS 0x18 // numbers of (writable) SID-registers
@@ -50,19 +49,20 @@ class Sid {
 		int Sid::GetSidType(int device);
 		void Sid::init(int device);
 		void Sid::push_event(int device, Uint8 reg, Uint8 val);
-		void Sid::startConsumer(int WriteThreadNo);
-		void Sid::stopConsumer(int WriteThreadNo);
+		void Sid::startConsumer(void);
+		void Sid::stopConsumer(void);
 
 		int error_state = 0;
 		int Number_Of_Devices = 0;
-
+		
 	private:	
 		juce::DynamicLibrary hardsidlibrary;
 		
 		ThreadSafeRingBuffer<WriteSet> ringBuffer0; 
 		ThreadSafeRingBuffer<WriteSet> ringBuffer1; 
 		ThreadSafeRingBuffer<WriteSet> ringBuffer2; 
-		SIDWriteThread consumerThread0;      
-		SIDWriteThread consumerThread1;     
-		SIDWriteThread consumerThread2;        
+		SIDWriteThread consumerThread;      
+
+
+		
 };
