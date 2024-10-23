@@ -14,11 +14,17 @@
 
 //------------------------------------------------------------------------------
 
-Sid::Sid() {
+Sid::Sid()	:	ringBuffer0(MY_BUFFER_SIZE),
+				ringBuffer1(MY_BUFFER_SIZE),
+				ringBuffer2(MY_BUFFER_SIZE),
+				consumerThread0(ringBuffer0,0), 
+				consumerThread1(ringBuffer1,1), 
+				consumerThread2(ringBuffer2,2)  
+	{
 		Number_Of_Devices = (int)HardSID_Devices();
 		if (Number_Of_Devices == 0) {
-				error_state = 3;
-			}
+			error_state = 3;
+		}
 	}
 
 Sid::~Sid() {
@@ -53,14 +59,53 @@ Sid::~Sid() {
 	}
 	void Sid::push_event(int device, Uint8 reg, Uint8 val) {
 
-		Uint8 RS = 0;
-		if (!error_state) {
-			while (RS != HSID_USB_WSTATE_OK)
-			{
-				RS = HardSID_Try_Write(device, 0, reg, val);
-				if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(20));
-			}
-			HardSID_SoftFlush(device);
+		switch(device) {
+		case 0: ringBuffer0.add({ reg, val });
+			break;
+		case 1: ringBuffer1.add({ reg, val });
+			break;
+		case 2: ringBuffer2.add({ reg, val });
+			break;
 		}
 	}
-
+	void Sid::startConsumer(int WriteThreadNo) {
+		switch (WriteThreadNo) {
+		case 0:
+			if (!consumerThread0.isThreadRunning()) {
+				consumerThread0.startThread();
+			}
+			break;
+		case 1:
+			if (!consumerThread1.isThreadRunning()) {
+				consumerThread1.startThread();
+			}
+			break;
+		case 2:
+			if (!consumerThread2.isThreadRunning()) {
+				consumerThread2.startThread();
+			}
+			break;
+		}
+	}
+	void Sid::stopConsumer(int WriteThreadNo) {
+		switch (WriteThreadNo) {
+		case 0:
+			if (consumerThread0.isThreadRunning()) {
+				consumerThread0.signalThreadShouldExit();
+				consumerThread0.waitForThreadToExit(1000);
+			}
+			break;
+		case 1:
+			if (consumerThread1.isThreadRunning()) {
+				consumerThread1.signalThreadShouldExit();
+				consumerThread1.waitForThreadToExit(1000);
+			}
+			break;
+		case 2:
+			if (consumerThread2.isThreadRunning()) {
+				consumerThread2.signalThreadShouldExit();
+				consumerThread2.waitForThreadToExit(1000);
+			}
+			break;
+		}
+	}

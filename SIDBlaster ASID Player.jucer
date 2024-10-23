@@ -6,6 +6,10 @@
               companyEmail="info@crazy-midi.de">
   <MAINGROUP id="iRcPnY" name="SIDBlaster ASID Player">
     <GROUP id="{B2ADDEAA-F2C0-E353-BBC5-F5219FB38A7C}" name="Source">
+      <FILE id="b39JQN" name="SIDWriteThread.h" compile="0" resource="0"
+            file="Source/SIDWriteThread.h"/>
+      <FILE id="HIfB6K" name="ThreadSafeRingBuffer.h" compile="0" resource="0"
+            file="Source/ThreadSafeRingBuffer.h"/>
       <FILE id="ZsBLoi" name="CrazyMidi_grau_64x64.png" compile="0" resource="1"
             file="Source/CrazyMidi_grau_64x64.png"/>
       <FILE id="aLzSp3" name="CrazyMidi_grau.png" compile="0" resource="1"

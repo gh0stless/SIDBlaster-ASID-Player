@@ -62,6 +62,7 @@ MainComponent::MainComponent()
     else {
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
             sid->init(i);
+            sid->startConsumer(i);
             auto SIDTYPE = sid->GetSidType(i);
             outputTextBox.insertTextAtCaret(juce::String(i+1) + ": ");
             if (SIDTYPE == 0)  outputTextBox.insertTextAtCaret("Unknown SID Type detected\n");
@@ -82,6 +83,7 @@ MainComponent::~MainComponent()
     }
     for (int i = 0; i < sid->Number_Of_Devices; i++) {
         sid->init(i);
+        sid->stopConsumer(i);
     }
     delete sid;
     saveComboBoxSelection(); // Speichere die Auswahl beim Beenden der Anwendung  

@@ -22,6 +22,8 @@ public:
     
     void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
     void setErrorState(bool hasError); 
+
+ 
     
 private:
     void comboBoxChanged(juce::ComboBox* comboBox) override; // Callback-Methode für die ComboBox
@@ -33,13 +35,13 @@ private:
 
     juce::ComboBox midiDeviceSelector; // ComboBox für MIDI-Geräte
     std::unique_ptr<juce::MidiInput> midiInput; // MidiInput-Objekt
-    juce::TextEditor outputTextBox;       // Textbox für Ausgaben
+    juce::TextEditor outputTextBox;      
 
     juce::ApplicationProperties appProperties;
     
     Sid* sid;
     int blinkTimer = 0;
-    LedIndicator led; // LED-Komponente
+    LedIndicator led; 
     juce::Image backgroundImage;
 
     bool Msg1Mem = false;
