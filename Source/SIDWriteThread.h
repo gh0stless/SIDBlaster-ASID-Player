@@ -15,7 +15,7 @@ public:
     SIDWriteThread(ThreadSafeRingBuffer<WriteSet>& buffer0, ThreadSafeRingBuffer<WriteSet>& buffer1, ThreadSafeRingBuffer<WriteSet>& buffer2, int& noofdevices)
         : Thread("SIDWriteThread"), ringBuffer0(buffer0), ringBuffer1(buffer1), ringBuffer2(buffer2), NoOfDevices(noofdevices) {}
     void run() override {
-        //setPriority(juce::Thread::Priority::background);
+        //setPriority(juce::Thread::Priority::highest);
         while (!threadShouldExit()) {
             #define WRITES_PER_FRAME 64 * 8
                 for (int i = 0; i < NoOfDevices; i++) {
@@ -43,7 +43,7 @@ public:
                                 RS = 0;
                                 while (RS != HSID_USB_WSTATE_OK) { //letzter write
                                     RS = HardSID_Try_Write(i, FRAME_IN_CYCLES - cycles[i], value.SIDRegister, value.SIDData);
-                                    if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                                    if (RS == HSID_USB_WSTATE_BUSY) juce::Thread::sleep(20);
                                 }
                                 cycles[i] = 0;
                             }
@@ -51,7 +51,7 @@ public:
                                 RS = 0;
                                 while (RS != HSID_USB_WSTATE_OK) {//normaler write
                                     RS = HardSID_Try_Write(i, cycles[i], value.SIDRegister, value.SIDData);
-                                    if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                                    if (RS == HSID_USB_WSTATE_BUSY) juce::Thread::sleep(20);
                                 }
                                 cycles[i] = cycles[i]+8;
                             }
@@ -60,9 +60,9 @@ public:
                         RS = 0;
                         while (RS != HSID_USB_WSTATE_OK) {
                             RS = HardSID_Try_Write(i, FRAME_IN_CYCLES, 0x1e, 0);  // mache nichts
-                            if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                            if (RS == HSID_USB_WSTATE_BUSY) juce::Thread::sleep(20);
                         }
-                        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                        //juce::Thread::sleep(20);
                     }
                 }
         }
