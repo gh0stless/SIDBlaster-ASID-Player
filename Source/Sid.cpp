@@ -17,7 +17,7 @@
 Sid::Sid()	:	ringBuffer0(MY_BUFFER_SIZE),
 				ringBuffer1(MY_BUFFER_SIZE),
 				ringBuffer2(MY_BUFFER_SIZE),
-				consumerThread(ringBuffer0, ringBuffer1, ringBuffer2,Number_Of_Devices)
+				consumerThread(ringBuffer0, ringBuffer1, ringBuffer2, Number_Of_Devices)
 
 	{
 		Number_Of_Devices = (int)HardSID_Devices();

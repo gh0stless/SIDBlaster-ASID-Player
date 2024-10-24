@@ -70,6 +70,7 @@ MainComponent::MainComponent()
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
+        sid->startConsumer();
         outputTextBox.insertTextAtCaret("READY\n.\n");
     }
 }
@@ -84,7 +85,7 @@ MainComponent::~MainComponent()
     }
     for (int i = 0; i < sid->Number_Of_Devices; i++) {
         sid->init(i);
-        sid->stopConsumer(i);
+        sid->stopConsumer();
     }
     delete sid;
     saveComboBoxSelection(); // Speichere die Auswahl beim Beenden der Anwendung  
@@ -136,7 +137,7 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
                         if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
                             if (!Msg1Mem) {
                                 outputTextBox.insertTextAtCaret("ASID Data recived, now playing...\n");
-                                sid->startConsumer(0);
+                                
                                 Msg1Mem = true;
                             }
                             sid->push_event(0, address, register_value);
@@ -144,7 +145,7 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
                         if ((data[1] == 80) && (sid->Number_Of_Devices > 1)) {
                             if (!Msg2Mem) {
                                 outputTextBox.insertTextAtCaret("2SID Data recived\n");
-                                sid->startConsumer(1);
+                                
                                 Msg2Mem = true;
                             }
                             sid->push_event(1, address, register_value);
@@ -152,7 +153,7 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
                         if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
                             if (!Msg3Mem) {
                                 outputTextBox.insertTextAtCaret("3SID Data recived\n");
-                                sid->startConsumer(2);
+                                
                                 Msg3Mem = true;
                             }
                             sid->push_event(2, address, register_value);
