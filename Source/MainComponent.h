@@ -76,7 +76,8 @@ private:
     LedIndicator led; 
     juce::Image backgroundImage;
 
- 
+    int noMidiDataTimer = 0; // Timer für die MIDI-Datenüberwachung
+    juce::Time lastMidiDataTime;  // Speichert den Zeitpunkt des letzten MIDI-Daten-Eingangs
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

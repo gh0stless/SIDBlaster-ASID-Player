@@ -14,17 +14,17 @@
 
 //------------------------------------------------------------------------------
 
-Sid::Sid()	:	ringBuffer0(MY_BUFFER_SIZE),
-				ringBuffer1(MY_BUFFER_SIZE),
-				ringBuffer2(MY_BUFFER_SIZE),
-				consumerThread(ringBuffer0, ringBuffer1, ringBuffer2, Number_Of_Devices)
-
-	{
-		Number_Of_Devices = (int)HardSID_Devices();
-		if (Number_Of_Devices == 0) {
-			error_state = 3;
-		}
+Sid::Sid()
+	: ringBuffer0(MY_BUFFER_SIZE),
+	ringBuffer1(MY_BUFFER_SIZE),
+	ringBuffer2(MY_BUFFER_SIZE),
+	consumerThread(ringBuffer0, ringBuffer1, ringBuffer2, Number_Of_Devices)
+{
+	Number_Of_Devices = (int)HardSID_Devices();
+	if (Number_Of_Devices == 0) {
+		error_state = 3;
 	}
+}
 
 Sid::~Sid() {
 #if defined(__APPLE__) || defined(__linux__)
@@ -51,14 +51,14 @@ Sid::~Sid() {
 			push_event(device, 0, 0x00);
 			std::this_thread::sleep_for(std::chrono::milliseconds(300));
 			BYTE r;
-			for (r = 0; r <= NUMSIDREGS; r++) {
+			for (r = 0; r < NUMSIDREGS; r++) {
 				push_event(device, r, 0x00);
 			}
 		}
 	}
 	void Sid::push_event(int device, Uint8 reg, Uint8 val) {
 
-		switch(device) {
+		switch (device) {
 		case 0: ringBuffer0.add({ reg, val });
 			break;
 		case 1: ringBuffer1.add({ reg, val });

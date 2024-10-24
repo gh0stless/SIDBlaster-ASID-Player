@@ -72,6 +72,7 @@ MainComponent::MainComponent()
         }
         sid->startConsumer();
         outputTextBox.insertTextAtCaret("READY\n.\n");
+
     }
 }
 
@@ -121,6 +122,8 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
 {
     if (message.isSysEx())
     {
+        
+        lastMidiDataTime = juce::Time::getCurrentTime();
         const Uint8* data = message.getSysExData();
         int dataSize = message.getSysExDataSize();
        
@@ -136,15 +139,15 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
                         uint8_t address = asid_sid_registers[mask * 7 + bit];
                         if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
                             if (!Msg1Mem) {
-                                outputTextBox.insertTextAtCaret("ASID Data recived, now playing...\n");
-                                
+                                outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
+                                startTimer(500);
                                 Msg1Mem = true;
                             }
                             sid->push_event(0, address, register_value);
                         }
                         if ((data[1] == 80) && (sid->Number_Of_Devices > 1)) {
                             if (!Msg2Mem) {
-                                outputTextBox.insertTextAtCaret("2SID Data recived\n");
+                                outputTextBox.insertTextAtCaret("2SID data recived\n");
                                 
                                 Msg2Mem = true;
                             }
@@ -152,7 +155,7 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
                         }
                         if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
                             if (!Msg3Mem) {
-                                outputTextBox.insertTextAtCaret("3SID Data recived\n");
+                                outputTextBox.insertTextAtCaret("3SID data recived\n");
                                 
                                 Msg3Mem = true;
                             }
@@ -229,6 +232,16 @@ void MainComponent::timerCallback()
         HV = !HV;
         led.setOn(HV); // LED-Status umschalten
  
+    }
+    // MIDI-Daten-Timeout-Logik
+    auto currentTime = juce::Time::getCurrentTime();
+    auto timeSinceLastMidi = currentTime - lastMidiDataTime;
+
+    if (timeSinceLastMidi.inMilliseconds() >= 3000)  // Überprüfe, ob 5 Sekunden ohne MIDI-Daten vergangen sind
+    {
+        outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
+        stopTimer();
+        Msg1Mem = false;
     }
 }
 

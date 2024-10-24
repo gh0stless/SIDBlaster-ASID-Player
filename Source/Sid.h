@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "./hardsid.h"
+#include "MainComponent.h"
 
 struct WriteSet {
 	Uint8 SIDRegister;
@@ -61,8 +62,11 @@ class Sid {
 		ThreadSafeRingBuffer<WriteSet> ringBuffer0; 
 		ThreadSafeRingBuffer<WriteSet> ringBuffer1; 
 		ThreadSafeRingBuffer<WriteSet> ringBuffer2; 
-		SIDWriteThread consumerThread;      
-
+		SIDWriteThread consumerThread;  
 
 		
+
+		
+
+
 };
