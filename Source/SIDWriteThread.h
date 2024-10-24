@@ -15,14 +15,9 @@ public:
     SIDWriteThread(ThreadSafeRingBuffer<WriteSet>& buffer0, ThreadSafeRingBuffer<WriteSet>& buffer1, ThreadSafeRingBuffer<WriteSet>& buffer2, int& noofdevices)
         : Thread("SIDWriteThread"), ringBuffer0(buffer0), ringBuffer1(buffer1), ringBuffer2(buffer2), NoOfDevices(noofdevices) {}
     void run() override {
+        //setPriority(juce::Thread::Priority::background);
         while (!threadShouldExit()) {
-
             #define WRITES_PER_FRAME 64 * 8
-            int cycles[3] = { 0, 0, 0 };
-            WriteSet value;
-            setPriority(juce::Thread::Priority::background);
-            do {
-                
                 for (int i = 0; i < NoOfDevices; i++) {
                     int RS = 0;
                     bool cie = false;
@@ -35,8 +30,6 @@ public:
                         break;
                     }
                     if (cie) {
-
-                        //for (int cycles = 0; cycles < WRITES_PER_FRAME; cycles += 8) {
                             int buffersize = 0;
                             switch (i) {
                             case 0:  buffersize = ringBuffer0.size();
@@ -72,7 +65,6 @@ public:
                         std::this_thread::sleep_for(std::chrono::milliseconds(2));
                     }
                 }
-            } while (true);
         }
     }
 
@@ -81,4 +73,6 @@ private:
     ThreadSafeRingBuffer<WriteSet>& ringBuffer1;
     ThreadSafeRingBuffer<WriteSet>& ringBuffer2;
     int& NoOfDevices; 
+    int cycles[3] = { 0, 0, 0 };
+    WriteSet value;
 };
