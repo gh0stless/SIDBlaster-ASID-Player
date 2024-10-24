@@ -18,66 +18,61 @@ public:
         while (!threadShouldExit()) {
 
             #define WRITES_PER_FRAME 64 * 8
-
+            int cycles[3] = { 0, 0, 0 };
+            WriteSet value;
             setPriority(juce::Thread::Priority::background);
-            for (int i = 0; i < NoOfDevices; i++) {
-                WriteSet value;
-                int RS = 0;
-                bool cie = false;
-                switch (i) {
+            do {
+                
+                for (int i = 0; i < NoOfDevices; i++) {
+                    int RS = 0;
+                    bool cie = false;
+                    switch (i) {
                     case 0:  cie = ringBuffer0.remove(value);
                         break;
                     case 1:  cie = ringBuffer1.remove(value);
                         break;
                     case 2:  cie = ringBuffer2.remove(value);
                         break;
-                }
-                if (cie) {
-                
-                    for (int cycles = 0; cycles < WRITES_PER_FRAME; cycles += 8) {
-                        int buffersize = 0;
-                        switch (i) {
+                    }
+                    if (cie) {
+
+                        //for (int cycles = 0; cycles < WRITES_PER_FRAME; cycles += 8) {
+                            int buffersize = 0;
+                            switch (i) {
                             case 0:  buffersize = ringBuffer0.size();
                                 break;
                             case 1:  buffersize = ringBuffer1.size();
                                 break;
                             case 2:  buffersize = ringBuffer2.size();
                                 break;
-                        }
-                        if (buffersize == 0 || cycles == WRITES_PER_FRAME - 8) {
-                            RS = 0;
-                            while (RS != HSID_USB_WSTATE_OK) { //letzter write
-                                RS = HardSID_Try_Write(i, FRAME_IN_CYCLES - cycles, value.SIDRegister, value.SIDData);
-                                if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(2));
                             }
-                            goto exit_Loop;
-                        }
+                            if (buffersize == 0 || cycles[i] == WRITES_PER_FRAME - 8) {
+                                RS = 0;
+                                while (RS != HSID_USB_WSTATE_OK) { //letzter write
+                                    RS = HardSID_Try_Write(i, FRAME_IN_CYCLES - cycles[i], value.SIDRegister, value.SIDData);
+                                    if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                                }
+                                cycles[i] = 0;
+                            }
+                            else {
+                                RS = 0;
+                                while (RS != HSID_USB_WSTATE_OK) {//normaler write
+                                    RS = HardSID_Try_Write(i, cycles[i], value.SIDRegister, value.SIDData);
+                                    if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                                }
+                                cycles[i] = cycles[i]+8;
+                            }
+                    }
+                    else { // wenn der Puffer leer ist
                         RS = 0;
-                        while (RS != HSID_USB_WSTATE_OK) {//normaler write
-                            RS = HardSID_Try_Write(i, cycles, value.SIDRegister, value.SIDData);
+                        while (RS != HSID_USB_WSTATE_OK) {
+                            RS = HardSID_Try_Write(i, FRAME_IN_CYCLES, 0x1e, 0);  // mache nichts
                             if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(2));
                         }
-                        switch (i) {
-                            case 0:  ringBuffer0.remove(value);
-                                break;
-                            case 1:  ringBuffer1.remove(value);
-                                break;
-                            case 2:  ringBuffer2.remove(value);
-                                break;
-                        }
+                        std::this_thread::sleep_for(std::chrono::milliseconds(2));
                     }
                 }
-                else { // wenn der Puffer leer ist
-                    RS = 0;
-                    while (RS != HSID_USB_WSTATE_OK) {
-                        RS = HardSID_Try_Write(i, FRAME_IN_CYCLES, 0x1e, 0);  // mache nichts
-                        if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(2));
-                    }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(2));
-                }
-            exit_Loop:;
-            }
-        
+            } while (true);
         }
     }
 
