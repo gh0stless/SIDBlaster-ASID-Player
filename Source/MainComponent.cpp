@@ -50,7 +50,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1 (alpha)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
     outputTextBox.insertTextAtCaret("DLL Version: " +  juce::String(sid->GetDLLVersion()) + "\n");
     
@@ -60,7 +60,7 @@ MainComponent::MainComponent()
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
     }
     else {
-        //if (sid->Number_Of_Devices>1) sid->Number_Of_Devices=1;
+        if (sid->Number_Of_Devices > 1) sid->Number_Of_Devices = 1; // *** Wir benutzen nur einen Sidblaster
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
             sid->init(i);
             
@@ -70,9 +70,8 @@ MainComponent::MainComponent()
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
-        sid->startConsumer();
-        outputTextBox.insertTextAtCaret("READY\n.\n");
-
+        
+        sid->startPlayerThread();
     }
 }
 
@@ -86,7 +85,7 @@ MainComponent::~MainComponent()
     }
     for (int i = 0; i < sid->Number_Of_Devices; i++) {
         sid->init(i);
-        sid->stopConsumer();
+        sid->stopPlayerThread();
     }
     delete sid;
     saveComboBoxSelection(); // Speichere die Auswahl beim Beenden der Anwendung  
@@ -137,6 +136,7 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
                             register_value |= 0x80;  /* the register_value needs its 8th MSB bit */
                         }
                         uint8_t address = asid_sid_registers[mask * 7 + bit];
+
                         if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
                             if (!Msg1Mem) {
                                 outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
@@ -147,19 +147,19 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
                         }
                         if ((data[1] == 80) && (sid->Number_Of_Devices > 1)) {
                             if (!Msg2Mem) {
-                                outputTextBox.insertTextAtCaret("2SID data recived\n");
+                                outputTextBox.insertTextAtCaret("2SID data recived, not supported\n");
                                 
                                 Msg2Mem = true;
                             }
-                            sid->push_event(1, address, register_value);
+                            //sid->push_event(1, address, register_value);
                         }
                         if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
                             if (!Msg3Mem) {
-                                outputTextBox.insertTextAtCaret("3SID data recived\n");
+                                outputTextBox.insertTextAtCaret("3SID data recived, not supported\n");
                                 
                                 Msg3Mem = true;
                             }
-                            sid->push_event(2, address, register_value);
+                            //sid->push_event(2, address, register_value);
                         }
                         reg++;
                     }
@@ -172,7 +172,7 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
         else if (data[0] == 45 && data[1] == 77) {
             outputTextBox.insertTextAtCaret("Stop\n");
         }
-        else if (data[0] == 45 && data[1] == 79) {
+        else if (data[0] == 45 && data[1] == 79) {//Display Data
             
             for (int i = 2; i < dataSize; ++i)
               {
@@ -237,7 +237,7 @@ void MainComponent::timerCallback()
     auto currentTime = juce::Time::getCurrentTime();
     auto timeSinceLastMidi = currentTime - lastMidiDataTime;
 
-    if (timeSinceLastMidi.inMilliseconds() >= 3000)  // Überprüfe, ob 5 Sekunden ohne MIDI-Daten vergangen sind
+    if (timeSinceLastMidi.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
         outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
         stopTimer();

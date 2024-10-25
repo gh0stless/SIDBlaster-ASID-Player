@@ -7,12 +7,10 @@
 
   ==============================================================================
 */
-
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "./hardsid.h"
-#include "MainComponent.h"
 
 struct WriteSet {
 	Uint8 SIDRegister;
@@ -50,8 +48,8 @@ class Sid {
 		int Sid::GetSidType(int device);
 		void Sid::init(int device);
 		void Sid::push_event(int device, Uint8 reg, Uint8 val);
-		void Sid::startConsumer(void);
-		void Sid::stopConsumer(void);
+		void Sid::startPlayerThread(void);
+		void Sid::stopPlayerThread(void);
 
 		int error_state = 0;
 		int Number_Of_Devices = 0;
@@ -59,14 +57,8 @@ class Sid {
 	private:	
 		juce::DynamicLibrary hardsidlibrary;
 		
-		ThreadSafeRingBuffer<WriteSet> ringBuffer0; 
-		ThreadSafeRingBuffer<WriteSet> ringBuffer1; 
-		ThreadSafeRingBuffer<WriteSet> ringBuffer2; 
-		SIDWriteThread consumerThread;  
+		ThreadSafeRingBuffer<WriteSet> ringBuffer; 
 
-		
-
-		
-
+		SIDWriteThread playerThread;  
 
 };

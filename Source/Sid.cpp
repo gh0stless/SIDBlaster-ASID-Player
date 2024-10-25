@@ -14,11 +14,9 @@
 
 //------------------------------------------------------------------------------
 
-Sid::Sid()
-	: ringBuffer0(MY_BUFFER_SIZE),
-	ringBuffer1(MY_BUFFER_SIZE),
-	ringBuffer2(MY_BUFFER_SIZE),
-	consumerThread(ringBuffer0, ringBuffer1, ringBuffer2, Number_Of_Devices)
+Sid::Sid() : ringBuffer(MY_BUFFER_SIZE),
+
+playerThread(ringBuffer) 
 {
 	Number_Of_Devices = (int)HardSID_Devices();
 	if (Number_Of_Devices == 0) {
@@ -57,29 +55,23 @@ Sid::~Sid() {
 		}
 	}
 	void Sid::push_event(int device, Uint8 reg, Uint8 val) {
+				
+		ringBuffer.add({ reg, val });
 
-		switch (device) {
-		case 0: ringBuffer0.add({ reg, val });
-			break;
-		case 1: ringBuffer1.add({ reg, val });
-			break;
-		case 2: ringBuffer2.add({ reg, val });
-			break;
-		}
 	}
-	void Sid::startConsumer(void) {
+	void Sid::startPlayerThread(void) {
 		
 		
-			if (!consumerThread.isThreadRunning()) {
-				consumerThread.startThread();
+			if (!playerThread.isThreadRunning()) {
+				playerThread.startThread();
 			}
 		
 	}
-	void Sid::stopConsumer(void) {
+	void Sid::stopPlayerThread(void) {
 	
-			if (consumerThread.isThreadRunning()) {
-				consumerThread.signalThreadShouldExit();
-				consumerThread.waitForThreadToExit(1000);
+			if (playerThread.isThreadRunning()) {
+				playerThread.signalThreadShouldExit();
+				playerThread.waitForThreadToExit(1000);
 			}
 	
 	}
