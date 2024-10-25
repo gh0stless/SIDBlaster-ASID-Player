@@ -50,7 +50,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
     outputTextBox.insertTextAtCaret("DLL Version: " +  juce::String(sid->GetDLLVersion()) + "\n");
     
@@ -60,15 +60,18 @@ MainComponent::MainComponent()
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
     }
     else {
+        if (sid->Number_Of_Devices > 1) sid->Number_Of_Devices = 1; // *** Wir benutzen nur einen Sidblaster
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
             sid->init(i);
+            
             auto SIDTYPE = sid->GetSidType(i);
             outputTextBox.insertTextAtCaret(juce::String(i+1) + ": ");
             if (SIDTYPE == 0)  outputTextBox.insertTextAtCaret("Unknown SID Type detected\n");
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
-        outputTextBox.insertTextAtCaret("READY\n.\n");
+        
+        sid->startPlayerThread();
     }
 }
 
@@ -82,6 +85,7 @@ MainComponent::~MainComponent()
     }
     for (int i = 0; i < sid->Number_Of_Devices; i++) {
         sid->init(i);
+        sid->stopPlayerThread();
     }
     delete sid;
     saveComboBoxSelection(); // Speichere die Auswahl beim Beenden der Anwendung  
@@ -117,64 +121,58 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
 {
     if (message.isSysEx())
     {
+        
+        lastMidiDataTime = juce::Time::getCurrentTime();
         const Uint8* data = message.getSysExData();
         int dataSize = message.getSysExDataSize();
-        
-        Uint8 idtable[28] = { 0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 4, 11, 18, 4, 11, 18 };
-        Uint8 dataP = 10;
-        Uint8 sidRegister = 0;
-        Uint8 sidData = 0;
-        Uint8 LSBdata = 0;
-        Uint8 NumberOfDataBytes = 0;
-
+       
         if ((dataSize > 3) && ((data[0]==45) && (data[1]==78 || data[1] == 80 || data[1] == 81))) {
-            for (int i = 0; i <= 3; i++) {
-                NumberOfDataBytes = NumberOfDataBytes + number_of_bits(data[i + 2]);
-            }
-            if ((NumberOfDataBytes + 8 + 2) == dataSize) {
-                for (int i = 0; i <= 3; i++) {
-                    Uint8 count = 0;
-                    for (Uint8 mask = 0x01; mask != 0x80; mask <<= 1) {
-                        if (data[i + 2] & mask) {
-                            //make a sid write
-                            sidRegister = idtable[i * 7 + count];
-                            LSBdata = data[dataP];
-                            dataP++;
-                            if (data[i + 6] & mask) {
-                                sidData = LSBdata + 127;
-                            }
-                            else {
-                                sidData = LSBdata;
-                            }
-                            if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
-                                if (!Msg1Mem) { outputTextBox.insertTextAtCaret("ASID Data recived, now playing...\n"); Msg1Mem = true; }
-                                sid->push_event(0, sidRegister, sidData);
-                            }
-                            if ((data[1] == 80) && (sid->Number_Of_Devices > 1)) {
-                                if (!Msg2Mem) { outputTextBox.insertTextAtCaret("2SID Data recived\n"); Msg2Mem = true; }
-                                sid->push_event(1, sidRegister, sidData);
-                            }
-                            if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
-                                if (!Msg3Mem) { outputTextBox.insertTextAtCaret("3SID Data recived\n"); Msg3Mem = true; }
-                                sid->push_event(2, sidRegister, sidData);
-                            }
+            unsigned int reg = 0;
+            for (uint8_t mask = 0; mask < 4; mask++) {  /* no more then 4 masks */
+                for (uint8_t bit = 0; bit < 7; bit++) {  /* each packet has 7 bits ~ stoopid midi */
+                    if (data[mask + 2] & (1 << bit)) {  /* 3 byte message, skip 3 each round and add the bit */
+                        uint8_t register_value = data[reg + 10];  /* get the value to write from the buffer */
+                        if (data[mask + 6] & (1 << bit)) {  /* if anything higher then 0 */
+                            register_value |= 0x80;  /* the register_value needs its 8th MSB bit */
                         }
-                        else {
+                        uint8_t address = asid_sid_registers[mask * 7 + bit];
+
+                        if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
+                            if (!Msg1Mem) {
+                                outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
+                                startTimer(500);
+                                Msg1Mem = true;
+                            }
+                            sid->push_event(0, address, register_value);
                         }
-                        count++;
+                        if ((data[1] == 80) && (sid->Number_Of_Devices > 1)) {
+                            if (!Msg2Mem) {
+                                outputTextBox.insertTextAtCaret("2SID data recived, not supported\n");
+                                
+                                Msg2Mem = true;
+                            }
+                            //sid->push_event(1, address, register_value);
+                        }
+                        if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
+                            if (!Msg3Mem) {
+                                outputTextBox.insertTextAtCaret("3SID data recived, not supported\n");
+                                
+                                Msg3Mem = true;
+                            }
+                            //sid->push_event(2, address, register_value);
+                        }
+                        reg++;
                     }
                 }
-                dataP = 10;
             }
         }
-        
         else if (data[0] == 45 && data[1] == 76) {
             outputTextBox.insertTextAtCaret("Start\n");
         }
         else if (data[0] == 45 && data[1] == 77) {
             outputTextBox.insertTextAtCaret("Stop\n");
         }
-        else if (data[0] == 45 && data[1] == 79) {
+        else if (data[0] == 45 && data[1] == 79) {//Display Data
             
             for (int i = 2; i < dataSize; ++i)
               {
@@ -234,6 +232,16 @@ void MainComponent::timerCallback()
         HV = !HV;
         led.setOn(HV); // LED-Status umschalten
  
+    }
+    // MIDI-Daten-Timeout-Logik
+    auto currentTime = juce::Time::getCurrentTime();
+    auto timeSinceLastMidi = currentTime - lastMidiDataTime;
+
+    if (timeSinceLastMidi.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
+    {
+        outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
+        stopTimer();
+        Msg1Mem = false;
     }
 }
 

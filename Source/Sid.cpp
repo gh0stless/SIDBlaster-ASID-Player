@@ -14,12 +14,15 @@
 
 //------------------------------------------------------------------------------
 
-Sid::Sid() {
-		Number_Of_Devices = (int)HardSID_Devices();
-		if (Number_Of_Devices == 0) {
-				error_state = 3;
-			}
+Sid::Sid() : ringBuffer(MY_BUFFER_SIZE),
+
+playerThread(ringBuffer) 
+{
+	Number_Of_Devices = (int)HardSID_Devices();
+	if (Number_Of_Devices == 0) {
+		error_state = 3;
 	}
+}
 
 Sid::~Sid() {
 #if defined(__APPLE__) || defined(__linux__)
@@ -46,21 +49,29 @@ Sid::~Sid() {
 			push_event(device, 0, 0x00);
 			std::this_thread::sleep_for(std::chrono::milliseconds(300));
 			BYTE r;
-			for (r = 0; r <= NUMSIDREGS; r++) {
+			for (r = 0; r < NUMSIDREGS; r++) {
 				push_event(device, r, 0x00);
 			}
 		}
 	}
 	void Sid::push_event(int device, Uint8 reg, Uint8 val) {
+				
+		ringBuffer.add({ reg, val });
 
-		Uint8 RS = 0;
-		if (!error_state) {
-			while (RS != HSID_USB_WSTATE_OK)
-			{
-				RS = HardSID_Try_Write(device, 0, reg, val);
-				if (RS == HSID_USB_WSTATE_BUSY) std::this_thread::sleep_for(std::chrono::milliseconds(20));
-			}
-			HardSID_SoftFlush(device);
-		}
 	}
-
+	void Sid::startPlayerThread(void) {
+		
+		
+			if (!playerThread.isThreadRunning()) {
+				playerThread.startThread();
+			}
+		
+	}
+	void Sid::stopPlayerThread(void) {
+	
+			if (playerThread.isThreadRunning()) {
+				playerThread.signalThreadShouldExit();
+				playerThread.waitForThreadToExit(1000);
+			}
+	
+	}
