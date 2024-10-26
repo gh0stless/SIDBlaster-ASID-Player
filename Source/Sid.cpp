@@ -19,7 +19,13 @@ Sid::Sid() : ringBuffer(MY_BUFFER_SIZE),
 playerThread(ringBuffer) 
 {
 	#if defined(_WIN32) || defined(_WIN64)
-		hardsiddll = hardsidlibrary.open("C://Program Files//Common Files//VST3//hardsid.dll");
+		// Ermitteln des Programmverzeichnisses
+		juce::File programDirectory = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory();
+
+		// Pfad zur Bibliothek konstruieren
+		juce::File libPath = programDirectory.getChildFile("hardsid.dll");
+
+		hardsiddll = hardsidlibrary.open(libPath.getFullPathName());
 		#endif	
 
 		#if defined(__linux)

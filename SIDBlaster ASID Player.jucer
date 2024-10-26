@@ -67,12 +67,12 @@
         <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <VS2022 targetFolder="Builds/VisualStudio2022" externalLibraries="..\..\libs\hardsid.lib"
-            extraLinkerFlags="&#10;" bigIcon="aLzSp3" smallIcon="ZsBLoi"
-            windowsTargetPlatformVersion="10.0.20348.0">
+    <VS2022 targetFolder="Builds/VisualStudio2022" extraLinkerFlags="&#10;"
+            bigIcon="aLzSp3" smallIcon="ZsBLoi" windowsTargetPlatformVersion="10.0.20348.0"
+            externalLibraries="hardsid.lib">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="0" name="Release" targetName="SIDBlaster ASID Player"
-                       useRuntimeLibDLL="1"/>
+                       useRuntimeLibDLL="1" libraryPath="..\..\libs\"/>
         <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster ASID Player"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
