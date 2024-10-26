@@ -65,8 +65,6 @@ void HardSID_GetSerial(char* output, int bufferSize, Uint8 DeviceID);
 // 0x203
 void HardSID_SetWriteBufferSize(Uint8 bufferSize);
 
-void HardSID_SetWriteBufferSize(Uint8 bufferSize);
-
 int HardSID_SetSIDType(Uint8 DeviceID, int sidtype_);
 
 int HardSID_GetSIDType(Uint8 DeviceID);

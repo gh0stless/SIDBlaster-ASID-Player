@@ -18,7 +18,7 @@ public:
 
     const juce::String getApplicationName() override       { return ProjectInfo::projectName; }
     const juce::String getApplicationVersion() override    { return ProjectInfo::versionString; }
-    bool moreThanOneInstanceAllowed() override             { return true; }
+    bool moreThanOneInstanceAllowed() override             { return false; }
 
     //==============================================================================
     void initialise (const juce::String& commandLine) override
@@ -26,6 +26,7 @@ public:
         // This method is where you should put your application's initialisation code..
 
         mainWindow.reset (new MainWindow (getApplicationName()));
+
     }
 
     void shutdown() override
@@ -94,6 +95,7 @@ public:
         */
 
     private:
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 

@@ -18,32 +18,59 @@ Sid::Sid() : ringBuffer(MY_BUFFER_SIZE),
 
 playerThread(ringBuffer) 
 {
-	Number_Of_Devices = (int)HardSID_Devices();
-	if (Number_Of_Devices == 0) {
-		error_state = 3;
-	}
+	#if defined(_WIN32) || defined(_WIN64)
+		hardsiddll = hardsidlibrary.open("C://Program Files//Common Files//VST3//hardsid.dll");
+		#endif	
+
+		#if defined(__linux)
+		hardsiddll = hardsidlibrary.open("/usr/local/lib/libhardsid.so");
+		#endif
+
+		#if defined(__APPLE__)
+		hardsiddll = hardsidlibrary.open("/usr/local/lib/libhardsid.dylib");
+		#endif
+
+		// Check to see if the library was loaded successfully 
+		if (hardsiddll == true) {
+          
+            My_HardSID_Version = (lpHardSID_Version)hardsidlibrary.getFunction("HardSID_Version");
+            My_HardSID_Devices = (lpHardSID_Devices)hardsidlibrary.getFunction("HardSID_Devices");
+            My_HardSID_Flush = (lpHardSID_Flush)hardsidlibrary.getFunction("HardSID_Flush");
+            My_HardSID_SoftFlush = (lpHardSID_SoftFlush)hardsidlibrary.getFunction("HardSID_SoftFlush");
+            My_HardSID_Lock = (lpHardSID_Lock)hardsidlibrary.getFunction("HardSID_Lock");
+            My_HardSID_Reset = (lpHardSID_Reset)hardsidlibrary.getFunction("HardSID_Reset");          
+            My_HardSID_Try_Write = (lpHardSID_Try_Write)hardsidlibrary.getFunction("HardSID_Try_Write");
+            My_HardSID_Uninitialize   = (lpHardSID_Uninitialize)hardsidlibrary.getFunction("HardSID_Uninitialize");
+			My_HardSID_GetSIDType = (lpHardSID_GetSIDType)hardsidlibrary.getFunction("HardSID_GetSIDType");
+
+			Number_Of_Devices = (int)My_HardSID_Devices();
+			if (Number_Of_Devices == 0) {
+				error_state = 2;
+			}
+		}
+		else error_state = 1;
 }
 
 Sid::~Sid() {
 #if defined(__APPLE__) || defined(__linux__)
-	HardSID_Uninitialize();
+	My_HardSID_Uninitialize();
 #endif
 }
 
 //------------------------------------------------------------------------------
 	int Sid::GetDLLVersion(void) {
-		return (int)HardSID_Version();
+		return (int)My_HardSID_Version();
 	}
 	int Sid::GetSidType(int device) {
-		return	HardSID_GetSIDType(device);
+		return	My_HardSID_GetSIDType(device);
 	}
 	void Sid::init(int device) {
 		if (!error_state) {
 
 			//Init SID
-			HardSID_Reset(device);
-			HardSID_Lock(device);
-			HardSID_Flush(device);
+			My_HardSID_Reset(device);
+			My_HardSID_Lock(device);
+			My_HardSID_Flush(device);
 
 			//Init Registers
 			push_event(device, 0, 0x00);

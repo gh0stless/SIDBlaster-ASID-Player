@@ -52,9 +52,9 @@ MainComponent::MainComponent()
 
     outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
-    outputTextBox.insertTextAtCaret("DLL Version: " +  juce::String(sid->GetDLLVersion()) + "\n");
-    
+        
     sid = new Sid();
+    outputTextBox.insertTextAtCaret("DLL Version: " +  juce::String(sid->GetDLLVersion()) + "\n");
     if (sid->error_state) {
         setErrorState(true);
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");

@@ -3,9 +3,11 @@
 <JUCERPROJECT id="TIT5TR" name="SIDBlaster ASID Player" projectType="guiapp"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
               companyName="crazy-midi.de" companyWebsite="www.crazy-midi.de"
-              companyEmail="info@crazy-midi.de">
+              companyEmail="info@crazy-midi.de" headerPath="Source">
   <MAINGROUP id="iRcPnY" name="SIDBlaster ASID Player">
     <GROUP id="{B2ADDEAA-F2C0-E353-BBC5-F5219FB38A7C}" name="Source">
+      <FILE id="EfPDEd" name="CrazyMidi_grau_128x128.png" compile="0" resource="1"
+            file="Source/CrazyMidi_grau_128x128.png"/>
       <FILE id="b39JQN" name="SIDWriteThread.h" compile="0" resource="0"
             file="Source/SIDWriteThread.h"/>
       <FILE id="HIfB6K" name="ThreadSafeRingBuffer.h" compile="0" resource="0"
@@ -44,23 +46,25 @@
   </MODULES>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
-    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" externalLibraries="hardsid"
+                extraCompilerFlags="&#10;" extraLinkerFlags="-Wl,-rpath,/usr/local/lib&#10;"
+                smallIcon="EfPDEd" bigIcon="aLzSp3">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster ASID Player"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="SIDBlaster ASID Player"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster-ASID-Player"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="SIDBlaster-ASID-Player"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_core" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_data_structures" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_events" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <VS2022 targetFolder="Builds/VisualStudio2022" externalLibraries="..\..\libs\hardsid.lib"
@@ -73,16 +77,16 @@
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_core" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_data_structures" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_events" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX">
@@ -92,16 +96,16 @@
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../../../Frameworks/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_core" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_data_structures" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_events" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../../../../Frameworks/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../../../../Frameworks/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>
