@@ -10,11 +10,17 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "./hardsid.h"
+#include "hardsid.h"
 
-struct WriteSet {
+struct SIDWriteSet {
 	Uint8 SIDRegister;
 	Uint8 SIDData;
+};
+
+typedef unsigned char  BYTE;
+
+enum SID_TYPE {
+	SID_TYPE_NONE = 0, SID_TYPE_6581, SID_TYPE_8580
 };
 
 #define NUMSIDREGS 0x18 // numbers of (writable) SID-registers
@@ -27,18 +33,10 @@ struct WriteSet {
 #define NTSC_CLOCKRATE 1022727 //This is for machines with 6567R8 VIC. 6567R56A is slightly different.
 #define FRAME_IN_CYCLES 19705 //( 17734475 / 18 / 50 )   // 50Hz in cycles for PAL clock
 
+#define MY_BUFFER_SIZE 1000
+
 #include "ThreadSafeRingBuffer.h"
 #include "SIDWriteThread.h"
-
-#define MY_BUFFER_SIZE 10000
-
-typedef unsigned char Uint8;
-typedef unsigned short Uint16;
-typedef unsigned char  BYTE;
-
-enum SID_TYPE {
-	SID_TYPE_NONE = 0, SID_TYPE_6581, SID_TYPE_8580
-};
 
 class Sid {
 	public:
@@ -80,7 +78,7 @@ class Sid {
 
 		bool hardsiddll = false;
 		
-		ThreadSafeRingBuffer<WriteSet> ringBuffer; 
+		ThreadSafeRingBuffer<SIDWriteSet> ringBuffer; 
 
 		SIDWriteThread playerThread;  
 

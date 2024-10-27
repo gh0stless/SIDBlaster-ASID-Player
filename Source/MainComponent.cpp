@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.1
+// Version 0.1.2
 
 #include "MainComponent.h"
 #include "Sid.h" 
@@ -50,7 +50,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1.2 (alpha)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
         
     sid = new Sid();
@@ -243,19 +243,6 @@ void MainComponent::timerCallback()
         stopTimer();
         Msg1Mem = false;
     }
-}
-
-Uint8 MainComponent::number_of_bits(Uint8 value) {
-    Uint8 ones = 0;
-    ones += value & 0x01;
-    ones += (value & 0x02) >> 1;
-    ones += (value & 0x04) >> 2;
-    ones += (value & 0x08) >> 3;
-    ones += (value & 0x10) >> 4;
-    ones += (value & 0x20) >> 5;
-    ones += (value & 0x40) >> 6;
-    ones += (value & 0x80) >> 7;
-    return ones;
 }
 
 // Methode zum Speichern der ComboBox-Auswahl

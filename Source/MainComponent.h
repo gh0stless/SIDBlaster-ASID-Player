@@ -60,7 +60,6 @@ public:
 private:
     void comboBoxChanged(juce::ComboBox* comboBox) override; // Callback-Methode für die ComboBox
     void timerCallback() override; // Timer-Callback deklarieren
-    Uint8 number_of_bits(Uint8 value);
 
     void saveComboBoxSelection(); // Methode zum Speichern der Auswahl
     void loadComboBoxSelection(); // Methode zum Laden der Auswahl

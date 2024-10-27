@@ -12,7 +12,7 @@
 class SIDWriteThread : public juce::Thread {
 
 public:
-    SIDWriteThread(ThreadSafeRingBuffer<WriteSet>& buffer)
+    SIDWriteThread(ThreadSafeRingBuffer<SIDWriteSet>& buffer)
         : Thread("SIDWriteThread"), ringBuffer(buffer) {}
     void run() override {
         //setPriority(juce::Thread::Priority::highest);
@@ -57,7 +57,7 @@ public:
     }
 
 private:
-    ThreadSafeRingBuffer<WriteSet>& ringBuffer;
+    ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer;
     int cycles = 0;
-    WriteSet value;
+    SIDWriteSet value;
 };
