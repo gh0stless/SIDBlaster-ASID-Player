@@ -91,7 +91,8 @@
       </MODULEPATHS>
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="hardsid" xcodeValidArchs="arm64,arm64e,x86_64"
-               extraLinkerFlags="-Wl,-rpath,/usr/local/lib&#10;">
+               extraLinkerFlags="-Wl,-rpath,/usr/local/lib&#10;" smallIcon="EfPDEd"
+               bigIcon="aLzSp3">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster-ASID-Player"
                        libraryPath="/usr/local/lib/"/>
