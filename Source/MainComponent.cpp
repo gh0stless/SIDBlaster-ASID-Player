@@ -60,18 +60,16 @@ MainComponent::MainComponent()
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
     }
     else {
+        sid->startPlayerThread();
         if (sid->Number_Of_Devices > 1) sid->Number_Of_Devices = 1; // *** Wir benutzen nur einen Sidblaster
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
             sid->init(i);
-            
             auto SIDTYPE = sid->GetSidType(i);
             outputTextBox.insertTextAtCaret(juce::String(i+1) + ": ");
             if (SIDTYPE == 0)  outputTextBox.insertTextAtCaret("Unknown SID Type detected\n");
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
-        
-        sid->startPlayerThread();
     }
 }
 
