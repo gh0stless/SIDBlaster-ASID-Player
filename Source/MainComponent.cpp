@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.1.2
+// Version 0.1.3
 
 #include "MainComponent.h"
 #include "Sid.h" 
@@ -50,7 +50,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1.2 (alpha)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1.3 (alpha)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
         
     sid = new Sid();
@@ -113,7 +113,6 @@ void MainComponent::resized()
     midiDeviceSelector.setBounds(10, 40, getWidth() - 20, 20); // Setze die Position und Größe der ComboBox
     outputTextBox.setBounds(10, 70, getWidth() - 20, getHeight() - 80); // TextEditor für Ausgaben
 }
-
 //==============================================================================
 void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message)
 {
@@ -181,7 +180,6 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
     }
 }
 
-// Callback-Methode für die ComboBox
 void MainComponent::comboBoxChanged(juce::ComboBox* comboBox)
 {
     if (comboBox == &midiDeviceSelector)
@@ -243,7 +241,6 @@ void MainComponent::timerCallback()
     }
 }
 
-// Methode zum Speichern der ComboBox-Auswahl
 void MainComponent::saveComboBoxSelection()
 {
     auto* propertiesFile = appProperties.getUserSettings();
@@ -254,7 +251,6 @@ void MainComponent::saveComboBoxSelection()
     }
 }
 
-// Methode zum Laden der ComboBox-Auswahl
 void MainComponent::loadComboBoxSelection()
 {
     auto* propertiesFile = appProperties.getUserSettings();

@@ -51,31 +51,25 @@ public:
     //==============================================================================
     void paint(juce::Graphics& g) override;
     void resized() override;
-
-    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
     void setErrorState(bool hasError); 
+ 
+private:
+    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
+    void comboBoxChanged(juce::ComboBox* comboBox) override; 
+    void timerCallback() override; 
+    void saveComboBoxSelection(); 
+    void loadComboBoxSelection(); 
+
     bool Msg1Mem = false;
     bool Msg2Mem = false;
     bool Msg3Mem = false;
-private:
-    void comboBoxChanged(juce::ComboBox* comboBox) override; // Callback-Methode für die ComboBox
-    void timerCallback() override; // Timer-Callback deklarieren
-
-    void saveComboBoxSelection(); // Methode zum Speichern der Auswahl
-    void loadComboBoxSelection(); // Methode zum Laden der Auswahl
-
-    juce::ComboBox midiDeviceSelector; // ComboBox für MIDI-Geräte
-    std::unique_ptr<juce::MidiInput> midiInput; // MidiInput-Objekt
+    juce::ComboBox midiDeviceSelector;
+    std::unique_ptr<juce::MidiInput> midiInput;
     juce::TextEditor outputTextBox;      
-
     juce::ApplicationProperties appProperties;
-    
     Sid* sid;
-    int blinkTimer = 0;
     LedIndicator led; 
     juce::Image backgroundImage;
-
-    int noMidiDataTimer = 0; // Timer für die MIDI-Datenüberwachung
     juce::Time lastMidiDataTime;  // Speichert den Zeitpunkt des letzten MIDI-Daten-Eingangs
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
