@@ -4,7 +4,6 @@
 // Version 0.1.3
 
 #include "MainComponent.h"
-#include "Sid.h" 
 
 MainComponent::MainComponent()
 {
