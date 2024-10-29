@@ -74,9 +74,10 @@ Sid::~Sid() {
 			//Init SID
 			My_HardSID_Reset(device);
 			My_HardSID_Lock(device);
+			My_HardSID_SoftFlush(device);
 			My_HardSID_Flush(device);
 
-			//Init Registers
+			////Init Registers
 			push_event(device, 0, 0x00);
 			juce::Thread::sleep(300);
 			BYTE r;
