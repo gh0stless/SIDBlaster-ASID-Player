@@ -17,10 +17,6 @@ public:
     void run() override {
         //setPriority(juce::Thread::Priority::highest);
         while (!threadShouldExit()) {
-    
-            #define WRITES_PER_FRAME 64 * 8
-                
-            int RS = 0;
             bool cie = false;
             cie = ringBuffer.remove(value);
                 if (cie) {
@@ -33,14 +29,15 @@ public:
     }
 
     bool HardSID_WriteWithTimeout(int dev_id, int cycles, int reg, int data) {
+        
         auto startTime = juce::Time::getMillisecondCounter();
-
+        
         while (HardSID_Try_Write(dev_id, cycles, reg, data) == HSID_USB_WSTATE_BUSY) {
-            juce::Thread::yield();  // CPU-Zeit für andere Threads freigeben
+            juce::Thread::yield();  
 
             auto elapsedTime = juce::Time::getMillisecondCounter() - startTime;
             if (elapsedTime > LOOP_TIME_OUT_MILLIS) {
-                return false;  // Timeout erreicht, Rückgabe false
+                return false;  
             }
         }
         return true;  // Schreibvorgang erfolgreich
