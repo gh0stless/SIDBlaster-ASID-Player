@@ -38,9 +38,11 @@ static const uint8_t asid_sid_registers[] =
     0x12, // 27 <= secondary for reg 18
 };
 
-class MainComponent :   public juce::Component,
+class MainComponent :   //public juce::AudioAppComponent,
+                        public juce::Component,
                         public juce::ComboBox::Listener,
                         public juce::MidiInputCallback,
+                        private juce::AsyncUpdater,
                         public juce::Timer
 {
     
@@ -49,12 +51,18 @@ public:
     MainComponent();
     ~MainComponent() override;
     //==============================================================================
+    //void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
+    //void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
+    //void releaseResources() override;
+    //==============================================================================
     void paint(juce::Graphics& g) override;
     void resized() override;
+    //==============================================================================
     void setErrorState(bool hasError); 
  
 private:
     void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
+    void handleAsyncUpdate() override;
     void comboBoxChanged(juce::ComboBox* comboBox) override; 
     void timerCallback() override; 
     void saveComboBoxSelection(); 
@@ -63,6 +71,7 @@ private:
     bool Msg1Mem = false;
     bool Msg2Mem = false;
     bool Msg3Mem = false;
+
     juce::ComboBox midiDeviceSelector;
     std::unique_ptr<juce::MidiInput> midiInput;
     juce::TextEditor outputTextBox;      
@@ -71,6 +80,9 @@ private:
     LedIndicator led; 
     juce::Image backgroundImage;
     juce::Time lastMidiDataTime;  // Speichert den Zeitpunkt des letzten MIDI-Daten-Eingangs
+
+    juce::CriticalSection midiMonitorLock;
+    juce::Array<juce::MidiMessage> incomingMessages;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

@@ -91,18 +91,16 @@ Sid::~Sid() {
 
 	}
 	void Sid::startPlayerThread(void) {
-		
-		
 			if (!playerThread.isThreadRunning()) {
 				playerThread.startThread();
 			}
 		
 	}
+
 	void Sid::stopPlayerThread(void) {
-	
+
 			if (playerThread.isThreadRunning()) {
 				playerThread.signalThreadShouldExit();
 				playerThread.waitForThreadToExit(1000);
 			}
-	
 	}
