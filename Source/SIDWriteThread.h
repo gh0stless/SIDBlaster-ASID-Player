@@ -23,7 +23,7 @@ public:
                     HardSID_WriteWithTimeout(0, cycles, value.SIDRegister, value.SIDData);
                 }
                 else { // wenn der Puffer leer ist
-                    HardSID_WriteWithTimeout(0, FRAME_IN_CYCLES, value.SIDRegister, value.SIDData);
+                    HardSID_WriteWithTimeout(0, cycles, 0x1e, 0);
                 }
         }
     }
@@ -34,7 +34,6 @@ public:
         
         while (HardSID_Try_Write(dev_id, cycles, reg, data) == HSID_USB_WSTATE_BUSY) {
             juce::Thread::yield();  
-
             auto elapsedTime = juce::Time::getMillisecondCounter() - startTime;
             if (elapsedTime > LOOP_TIME_OUT_MILLIS) {
                 return false;  
