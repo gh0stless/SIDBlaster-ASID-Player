@@ -12,31 +12,42 @@
 class SIDWriteThread : public juce::Thread {
 
 public:
-    SIDWriteThread(ThreadSafeRingBuffer<SIDWriteSet>& buffer)
-        : Thread("SIDWriteThread"), ringBuffer(buffer) {}
+    SIDWriteThread(ThreadSafeRingBuffer<SIDWriteSet>& buffer0, ThreadSafeRingBuffer<SIDWriteSet>& buffer1, ThreadSafeRingBuffer<SIDWriteSet>& buffer2, int& noofdevices)
+        : Thread("SIDWriteThread"), ringBuffer0(buffer0), ringBuffer1(buffer1), ringBuffer2(buffer2), NoOfDevices(noofdevices) {}
     void run() override {
         //setPriority(juce::Thread::Priority::highest);
         while (!threadShouldExit()) {
-            bool cie = false;
-            cie = ringBuffer.remove(value);
+           
+            for (auto i = 0; i < NoOfDevices; i++) {
+                
+                bool cie = false;
+                switch (i) {
+                case 0:  cie = ringBuffer0.remove(value);
+                    break;
+                case 1:  cie = ringBuffer1.remove(value);
+                    break;
+                case 2:  cie = ringBuffer2.remove(value);
+                    break;
+                }
                 if (cie) {
-                    HardSID_WriteWithTimeout(0, cycles, value.SIDRegister, value.SIDData);
+                    HardSID_WriteWithTimeout(i, cycles, value.SIDRegister, value.SIDData);
                 }
                 else { // wenn der Puffer leer ist
-                    HardSID_WriteWithTimeout(0, cycles, 0x1e, 0);
+                    HardSID_WriteWithTimeout(i, cycles, 0x1e, 0);
                 }
+            }
         }
     }
 
     bool HardSID_WriteWithTimeout(int dev_id, int cycles, int reg, int data) {
-        
+
         auto startTime = juce::Time::getMillisecondCounter();
-        
+
         while (HardSID_Try_Write(dev_id, cycles, reg, data) == HSID_USB_WSTATE_BUSY) {
-            juce::Thread::yield();  
+            juce::Thread::yield();
             auto elapsedTime = juce::Time::getMillisecondCounter() - startTime;
             if (elapsedTime > LOOP_TIME_OUT_MILLIS) {
-                return false;  
+                return false;
             }
         }
         return true;  // Schreibvorgang erfolgreich
@@ -44,7 +55,10 @@ public:
 
 private:
     int LOOP_TIME_OUT_MILLIS = 500;  // Timeout in Millisekunden
-    ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer;
-    int cycles = 8;
+    int cycles = 8 ;
     SIDWriteSet value;
+    ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer0;
+    ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer1;
+    ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer2;
+    int& NoOfDevices;
 };

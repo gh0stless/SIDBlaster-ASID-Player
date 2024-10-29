@@ -60,16 +60,15 @@ MainComponent::MainComponent()
     }
     else {
         sid->startPlayerThread();
-        if (sid->Number_Of_Devices > 1) sid->Number_Of_Devices = 1; // *** Wir benutzen nur einen Sidblaster
+        if (sid->Number_Of_Devices > 3) sid->Number_Of_Devices = 3; // *** Wir benutzen nur max. drei Sidblaster
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
-            //sid->init(i);
+            sid->init(i);
             auto SIDTYPE = sid->GetSidType(i);
             outputTextBox.insertTextAtCaret(juce::String(i+1) + ": ");
             if (SIDTYPE == 0)  outputTextBox.insertTextAtCaret("Unknown SID Type detected\n");
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
-        sid->stopPlayerThread();
     }
     //// Some platforms require permissions to open input channels so request that here
     //if (juce::RuntimePermissions::isRequired(juce::RuntimePermissions::recordAudio)
@@ -94,11 +93,11 @@ MainComponent::~MainComponent()
         midiInput->stop();
         midiInput = nullptr;
     }
-    sid->startPlayerThread();
+    
     for (int i = 0; i < sid->Number_Of_Devices; i++) {
         sid->init(i);
-        sid->stopPlayerThread();
     }
+    sid->stopPlayerThread();
     delete sid;
     saveComboBoxSelection(); // Speichere die Auswahl beim Beenden der Anwendung  
 }
@@ -200,7 +199,7 @@ void MainComponent::handleAsyncUpdate() {
 
                         if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
                             if (!Msg1Mem) {
-                                sid->startPlayerThread();
+                                //sid->startPlayerThread();
                                 outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
                                 startTimer(500);
                                 Msg1Mem = true;
@@ -213,7 +212,7 @@ void MainComponent::handleAsyncUpdate() {
 
                                 Msg2Mem = true;
                             }
-                            //sid->push_event(1, address, register_value);
+                            sid->push_event(1, address, register_value);
                         }
                         if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
                             if (!Msg3Mem) {
@@ -221,7 +220,7 @@ void MainComponent::handleAsyncUpdate() {
 
                                 Msg3Mem = true;
                             }
-                            //sid->push_event(2, address, register_value);
+                            sid->push_event(2, address, register_value);
                         }
                         reg++;
                     }
@@ -301,7 +300,7 @@ void MainComponent::timerCallback()
 
     if (timeSinceLastMidi.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
-        sid->stopPlayerThread();
+        //sid->stopPlayerThread();
         outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
         stopTimer();
         Msg1Mem = false;
