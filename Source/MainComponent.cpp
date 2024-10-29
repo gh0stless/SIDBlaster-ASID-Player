@@ -49,7 +49,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1.3 (alpha)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1.4 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
         
     sid = new Sid();
