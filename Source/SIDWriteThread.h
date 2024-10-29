@@ -17,10 +17,9 @@ public:
     void run() override {
         //setPriority(juce::Thread::Priority::highest);
         while (!threadShouldExit()) {
-    
-            #define WRITES_PER_FRAME 64 * 8
-            for (auto i = 0; i < 3; i++) {
-                int RS = 0;
+           
+            for (auto i = 0; i < NoOfDevices; i++) {
+                
                 bool cie = false;
                 switch (i) {
                 case 0:  cie = ringBuffer0.remove(value);
@@ -31,48 +30,32 @@ public:
                     break;
                 }
                 if (cie) {
-                    int buffersize = 0;
-                    switch (i) {
-                    case 0:  buffersize = ringBuffer0.size();
-                        break;
-                    case 1:  buffersize = ringBuffer1.size();
-                        break;
-                    case 2:  buffersize = ringBuffer2.size();
-                        break;
-                    }
-
-                    if (buffersize == 0 || cycles[i] == WRITES_PER_FRAME - 8) {
-                        RS = 0;
-                        while (RS != HSID_USB_WSTATE_OK) { //letzter write
-                            RS = HardSID_Try_Write(i, FRAME_IN_CYCLES - cycles[i], value.SIDRegister, value.SIDData);
-                            if (RS == HSID_USB_WSTATE_BUSY) juce::Thread::sleep(20);
-                        }
-                        cycles[i] = 0;
-                    }
-                    else {
-                        RS = 0;
-                        while (RS != HSID_USB_WSTATE_OK) {//normaler write
-                            RS = HardSID_Try_Write(i, cycles[i], value.SIDRegister, value.SIDData);
-                            if (RS == HSID_USB_WSTATE_BUSY) juce::Thread::sleep(20);
-                        }
-                        cycles[i] = cycles[i] + 8;
-                    }
+                    HardSID_WriteWithTimeout(i, cycles, value.SIDRegister, value.SIDData);
                 }
                 else { // wenn der Puffer leer ist
-                    RS = 0;
-                    while (RS != HSID_USB_WSTATE_OK) {
-                        RS = HardSID_Try_Write(i, FRAME_IN_CYCLES, 0x1e, 0);  // mache nichts
-                        if (RS == HSID_USB_WSTATE_BUSY) juce::Thread::sleep(20);
-                    }
-                    juce::Thread::sleep(20);
+                    HardSID_WriteWithTimeout(i, cycles, 0x1e, 0);
                 }
             }
         }
     }
 
+    bool HardSID_WriteWithTimeout(int dev_id, int cycles, int reg, int data) {
+
+        auto startTime = juce::Time::getMillisecondCounter();
+
+        while (HardSID_Try_Write(dev_id, cycles, reg, data) == HSID_USB_WSTATE_BUSY) {
+            juce::Thread::yield();
+            auto elapsedTime = juce::Time::getMillisecondCounter() - startTime;
+            if (elapsedTime > LOOP_TIME_OUT_MILLIS) {
+                return false;
+            }
+        }
+        return true;  // Schreibvorgang erfolgreich
+    }
+
 private:
-    
-    int cycles[3] = { 0,0,0 };
+    int LOOP_TIME_OUT_MILLIS = 500;  // Timeout in Millisekunden
+    int cycles = 8 ;
     SIDWriteSet value;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer0;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer1;
