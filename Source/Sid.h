@@ -78,8 +78,9 @@ class Sid {
 
 		bool hardsiddll = false;
 		
-		ThreadSafeRingBuffer<SIDWriteSet> ringBuffer; 
-
+		ThreadSafeRingBuffer<SIDWriteSet> ringBuffer0;
+		ThreadSafeRingBuffer<SIDWriteSet> ringBuffer1;
+		ThreadSafeRingBuffer<SIDWriteSet> ringBuffer2;
 		SIDWriteThread playerThread;  
 
 };
