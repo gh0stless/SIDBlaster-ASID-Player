@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.1.3
+// Version 0.2.0
 
 #include "MainComponent.h"
 
@@ -49,7 +49,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.1.4 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.2.0 (alpha)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
         
     sid = new Sid();
