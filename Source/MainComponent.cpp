@@ -18,7 +18,7 @@ MainComponent::MainComponent()
     midiDeviceSelector.setColour(juce::ComboBox::textColourId, juce::Colours::lightgreen);
 
     juce::PropertiesFile::Options options;
-    options.applicationName = "SIDBLaster ASID Player";
+    options.applicationName = "SIDBlaster ASID Player";
     options.filenameSuffix = ".settings";
     options.osxLibrarySubFolder = "Application Support";
     appProperties.setStorageParameters(options);
@@ -300,37 +300,32 @@ void MainComponent::timerCallback()
     }
 }
 
-void MainComponent::saveComboBoxSelection()
-{
+void MainComponent::saveComboBoxSelection(){
     auto* propertiesFile = appProperties.getUserSettings();
-    if (propertiesFile != nullptr) 
-    {
+    if (propertiesFile != nullptr) {
         propertiesFile->setValue("midiDevice", midiDeviceSelector.getSelectedId());
-        propertiesFile->saveIfNeeded();
+        if (midiDeviceSelector.getSelectedId() != 0) {
+            propertiesFile->saveIfNeeded();
+        }
     }
 }
 
-void MainComponent::loadComboBoxSelection()
-{
+void MainComponent::loadComboBoxSelection(){
     auto* propertiesFile = appProperties.getUserSettings();
 
     // Wenn die Datei nicht existiert oder leer ist, initialisiere sie
-    if (propertiesFile == nullptr || !propertiesFile->containsKey("midiDevice"))
-    {
+    if (propertiesFile == nullptr || !propertiesFile->containsKey("midiDevice")){
         // Wähle das erste MIDI-Gerät aus der Liste als Standard aus, wenn vorhanden
-        if (midiDeviceSelector.getNumItems() > 0)
-        {
+        if (midiDeviceSelector.getNumItems() > 0){
             midiDeviceSelector.setSelectedItemIndex(0);
         }
         //saveComboBoxSelection(); // Speichere die Standardauswahl
     }
-    else
-    {
+    else{
         // Lade die gespeicherte Auswahl
         int selectedDeviceId = propertiesFile->getIntValue("midiDevice", 0); // Standard-ID ist 0
-        ///if (selectedDeviceId > 0)
-        //{
+        if (selectedDeviceId > 0){
             midiDeviceSelector.setSelectedId(selectedDeviceId);
-        //}
+        }
     }
 }
