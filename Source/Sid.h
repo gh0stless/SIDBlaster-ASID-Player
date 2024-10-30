@@ -36,6 +36,8 @@ enum SID_TYPE {
 #include "ThreadSafeRingBuffer.h"
 #include "SIDWriteThread.h"
 
+//==============================================================================
+
 class Sid {
 	public:
 		Sid();

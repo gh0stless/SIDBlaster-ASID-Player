@@ -47,8 +47,7 @@ static const uint8_t asid_sid_registers[] =
     0x12, // 27 <= secondary for reg 18
 };
 
-class MainComponent :   //public juce::AudioAppComponent,
-                        public juce::Component,
+class MainComponent :   public juce::Component,
                         public juce::ComboBox::Listener,
                         public juce::MidiInputCallback,
                         private juce::AsyncUpdater,

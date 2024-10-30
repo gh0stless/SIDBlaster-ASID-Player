@@ -101,7 +101,6 @@ Sid::~Sid() {
 			}
 		
 	}
-
 	void Sid::stopPlayerThread(void) {
 
 			if (playerThread.isThreadRunning()) {

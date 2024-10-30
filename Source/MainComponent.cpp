@@ -115,7 +115,7 @@ void MainComponent::resized()
     midiDeviceSelector.setBounds(10, 40, juce::Component::getWidth() - 20, 20); // Setze die Position und Größe der ComboBox
     outputTextBox.setBounds(10, 70, juce::Component::getWidth() - 20, juce::Component::getHeight() - 80); // TextEditor für Ausgaben
 }
-
+//==============================================================================
 void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message)
 {
     if (message.isSysEx())
@@ -221,7 +221,7 @@ void MainComponent::handleAsyncUpdate() {
     }
     incomingMessages.clear(); // Nachrichtencache leeren
 }
-
+//==============================================================================
 void MainComponent::comboBoxChanged(juce::ComboBox* comboBox)
 {
     if (comboBox == &midiDeviceSelector)
