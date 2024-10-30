@@ -306,9 +306,7 @@ void MainComponent::saveComboBoxSelection()
     if (propertiesFile != nullptr) 
     {
         propertiesFile->setValue("midiDevice", midiDeviceSelector.getSelectedId());
-        if (!propertiesFile->saveIfNeeded()) {
-            outputTextBox.insertTextAtCaret("Kann Einstellungen nicht speichern\n");
-        }
+        propertiesFile->saveIfNeeded();
     }
 }
 
@@ -319,7 +317,6 @@ void MainComponent::loadComboBoxSelection()
     // Wenn die Datei nicht existiert oder leer ist, initialisiere sie
     if (propertiesFile == nullptr || !propertiesFile->containsKey("midiDevice"))
     {
-        outputTextBox.insertTextAtCaret("Kann Einstellungen nicht laden\n");
         // Wähle das erste MIDI-Gerät aus der Liste als Standard aus, wenn vorhanden
         if (midiDeviceSelector.getNumItems() > 0)
         {
@@ -331,9 +328,9 @@ void MainComponent::loadComboBoxSelection()
     {
         // Lade die gespeicherte Auswahl
         int selectedDeviceId = propertiesFile->getIntValue("midiDevice", 0); // Standard-ID ist 0
-        if (selectedDeviceId > 0)
-        {
+        ///if (selectedDeviceId > 0)
+        //{
             midiDeviceSelector.setSelectedId(selectedDeviceId);
-        }
+        //}
     }
 }
