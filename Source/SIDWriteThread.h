@@ -15,7 +15,7 @@ public:
     SIDWriteThread(ThreadSafeRingBuffer<SIDWriteSet>& buffer0, ThreadSafeRingBuffer<SIDWriteSet>& buffer1, ThreadSafeRingBuffer<SIDWriteSet>& buffer2, int& noofdevices)
         : Thread("SIDWriteThread"), ringBuffer0(buffer0), ringBuffer1(buffer1), ringBuffer2(buffer2), NoOfDevices(noofdevices) {}
     void run() override {
-        //setPriority(juce::Thread::Priority::highest);
+        setPriority(juce::Thread::Priority::highest);
         while (!threadShouldExit()) {
            
             for (auto i = 0; i < NoOfDevices; i++) {
