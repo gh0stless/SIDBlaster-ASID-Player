@@ -1,44 +1,32 @@
-/*
-  ==============================================================================
-
-    ThreadSafeRingBuffer.h
-    Created: 22 Oct 2024 10:28:42am
-    Author:  Andreas Schumm (gh0stless)
-
-  ==============================================================================
-*/
-#pragma once
 #include <JuceHeader.h>
+#include <atomic>
+#include <vector>
 
 template <typename T>
 class ThreadSafeRingBuffer {
 public:
-    ThreadSafeRingBuffer(size_t size)
-        : maxSize(size), head(0), tail(0), isFull(false) {
-        buffer = new T[maxSize];  // Fester Speicher für den Ringpuffer
-    }
-
-    ~ThreadSafeRingBuffer() {
-        delete[] buffer;  // Speicher freigeben
-    }
+    explicit ThreadSafeRingBuffer(size_t size)
+        : buffer(size), maxSize(size), head(0), tail(0), isFull(false) {}
 
     // Add a new value to the ring buffer
     void add(const T& value) {
-        juce::ScopedLock lock(mutex);  // Sperrt den kritischen Abschnitt
-        buffer[head] = value;
-        auto nextHead = (head + 1) % maxSize;
+        juce::ScopedLock lock(mutex);
 
-        if (nextHead == tail) {  // Puffer ist voll, schiebe den Tail-Zeiger weiter
+        buffer[head] = value;
+        head = (head + 1) % maxSize;
+
+        if (head == tail) {  // Puffer ist voll
             tail = (tail + 1) % maxSize;
             isFull = true;
         }
-
-        head = nextHead;
+        else {
+            isFull = false;
+        }
     }
 
     // Remove an item from the ring buffer
     bool remove(T& value) {
-        juce::ScopedLock lock(mutex);  // Sperrt den kritischen Abschnitt
+        juce::ScopedLock lock(mutex);
         if (isEmpty()) {
             return false;
         }
@@ -52,15 +40,15 @@ public:
 
     // Check if the buffer is empty
     bool isEmpty() const {
-        juce::ScopedLock lock(mutex);  // Sperrt den kritischen Abschnitt
+        juce::ScopedLock lock(mutex);
         return (!isFull && (head == tail));
     }
 
 private:
-    T* buffer;  // C-Array für den Puffer
-    const size_t maxSize;  // Maximale Größe des Puffers
-    size_t head;  // Kopfzeiger
-    size_t tail;  // Schwanzzeiger
-    bool isFull;  // Status, ob der Puffer voll ist
-    mutable juce::CriticalSection mutex;  // JUCE Mutex für Thread-Sicherheit
+    std::vector<T> buffer;  // Vector statt C-Array
+    const size_t maxSize;
+    std::atomic<size_t> head;  // Atomare Kopfzeiger
+    std::atomic<size_t> tail;  // Atomare Schwanzzeiger
+    std::atomic<bool> isFull;  // Atomarer Status
+    mutable juce::CriticalSection mutex;
 };

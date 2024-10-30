@@ -34,6 +34,7 @@ public:
                 else { // wenn der Puffer leer ist
                     HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); //mache nichts
                 }
+                //juce::Thread::sleep(1);  // Kleiner Sleep, um die CPU-Belastung zu senken
             }
 
         }
