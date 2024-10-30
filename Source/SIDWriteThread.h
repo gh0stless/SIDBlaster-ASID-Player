@@ -53,8 +53,8 @@ public:
 
 private:
     const int LOOP_TIME_OUT_MILLIS = 500;  // Timeout in Millisekunden
-    int cycles = 8 ;
-    SIDWriteSet value;
+    const int cycles = 8 ;
+    SIDWriteSet value ;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer0;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer1;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer2;

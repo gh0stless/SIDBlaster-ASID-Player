@@ -163,21 +163,39 @@ void MainComponent::handleAsyncUpdate() {
                             }
                             sid->push_event(0, address, register_value);
                         }
-                        if ((data[1] == 80) && (sid->Number_Of_Devices > 1)) {
-                            lastMidiDataTime1 = juce::Time::getCurrentTime();
-                            if (!Msg2Mem) {
-                                outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
-                                Msg2Mem = true;
+                        if (data[1] == 80) {
+                            if (sid->Number_Of_Devices > 1) {
+                                lastMidiDataTime1 = juce::Time::getCurrentTime();
+                                if (!Msg2Mem) {
+                                    outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
+                                    Msg2Mem = true;
+                                }
+                                sid->push_event(1, address, register_value);
                             }
-                            sid->push_event(1, address, register_value);
+                            else {
+                                lastMidiDataTime1 = juce::Time::getCurrentTime();
+                                if (!Msg2Mem) {
+                                    outputTextBox.insertTextAtCaret("You need more SIDBlasters for 2SID\n");
+                                    Msg2Mem = true;
+                                }
+                            }
                         }
-                        if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
-                            lastMidiDataTime2 = juce::Time::getCurrentTime();
-                            if (!Msg3Mem) {
-                                outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
-                                Msg3Mem = true;
+                        if (data[1] == 81) {
+                            if (sid->Number_Of_Devices > 2) {
+                                lastMidiDataTime2 = juce::Time::getCurrentTime();
+                                if (!Msg3Mem) {
+                                    outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
+                                    Msg3Mem = true;
+                                }
+                                sid->push_event(2, address, register_value);
                             }
-                            sid->push_event(2, address, register_value);
+                            else {
+                                lastMidiDataTime2 = juce::Time::getCurrentTime();
+                                if (!Msg3Mem) {
+                                    outputTextBox.insertTextAtCaret("You need more SIDBlasters for 3SID\n");
+                                    Msg3Mem = true;
+                                }
+                            }
                         }
                         reg++;
                     }

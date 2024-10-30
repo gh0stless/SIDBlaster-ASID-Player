@@ -17,8 +17,6 @@ struct SIDWriteSet {
 	Uint8 SIDData;
 };
 
-typedef unsigned char  BYTE;
-
 enum SID_TYPE {
 	SID_TYPE_NONE = 0, SID_TYPE_6581, SID_TYPE_8580
 };
@@ -33,7 +31,7 @@ enum SID_TYPE {
 #define NTSC_CLOCKRATE 1022727 //This is for machines with 6567R8 VIC. 6567R56A is slightly different.
 #define FRAME_IN_CYCLES 19705 //( 17734475 / 18 / 50 )   // 50Hz in cycles for PAL clock
 
-#define MY_BUFFER_SIZE 10000
+#define MY_BUFFER_SIZE 128
 
 #include "ThreadSafeRingBuffer.h"
 #include "SIDWriteThread.h"
