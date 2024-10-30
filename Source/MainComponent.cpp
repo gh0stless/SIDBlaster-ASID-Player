@@ -21,17 +21,28 @@ MainComponent::MainComponent()
     options.applicationName = "SIDBLaster ASID Player";
     options.filenameSuffix = ".settings";
     options.osxLibrarySubFolder = "Application Support";
-
     appProperties.setStorageParameters(options);
     
+    // TextEditor für Ausgaben konfigurieren
+    juce::Component::addAndMakeVisible(outputTextBox);
+    outputTextBox.setMultiLine(true);
+    outputTextBox.setReadOnly(true);
+    outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
+    outputTextBox.setScrollbarsShown(true);
+
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.0 (alpha)\n");
+    outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
+
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
     auto midiInputs = juce::MidiInput::getAvailableDevices();
     for (const auto& device : midiInputs)
     {
         midiDeviceSelector.addItem(device.name, device.identifier.hashCode());
     }
+
     // Lade die gespeicherte Auswahl
     loadComboBoxSelection();
+    
     // MIDI Input initialisieren
     if (midiInputs.size() > 0)
     {
@@ -42,15 +53,6 @@ MainComponent::MainComponent()
         }
     }
 
-    // TextEditor für Ausgaben konfigurieren
-    juce::Component::addAndMakeVisible(outputTextBox);
-    outputTextBox.setMultiLine(true);
-    outputTextBox.setReadOnly(true);
-    outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
-    outputTextBox.setScrollbarsShown(true);
-
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.0 (alpha)\n");
-    outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
         
     sid = new Sid();
     outputTextBox.insertTextAtCaret("DLL Version: " +  juce::String(sid->GetDLLVersion()) + "\n");
@@ -304,7 +306,9 @@ void MainComponent::saveComboBoxSelection()
     if (propertiesFile != nullptr) 
     {
         propertiesFile->setValue("midiDevice", midiDeviceSelector.getSelectedId());
-        propertiesFile->saveIfNeeded(); // Speichere nur, wenn Änderungen gemacht wurden
+        if (!propertiesFile->saveIfNeeded()) {
+            outputTextBox.insertTextAtCaret("Kann Einstellungen nicht speichern\n");
+        }
     }
 }
 
@@ -315,12 +319,13 @@ void MainComponent::loadComboBoxSelection()
     // Wenn die Datei nicht existiert oder leer ist, initialisiere sie
     if (propertiesFile == nullptr || !propertiesFile->containsKey("midiDevice"))
     {
+        outputTextBox.insertTextAtCaret("Kann Einstellungen nicht laden\n");
         // Wähle das erste MIDI-Gerät aus der Liste als Standard aus, wenn vorhanden
         if (midiDeviceSelector.getNumItems() > 0)
         {
             midiDeviceSelector.setSelectedItemIndex(0);
         }
-        saveComboBoxSelection(); // Speichere die Standardauswahl
+        //saveComboBoxSelection(); // Speichere die Standardauswahl
     }
     else
     {
