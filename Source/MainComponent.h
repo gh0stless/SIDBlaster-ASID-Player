@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+    MainComponent.h
+    Created: 22 Oct 2024 10:28:42am
+    Author:  Andreas Schumm (gh0stless)
+
+  ==============================================================================
+*/
 #pragma once
 
 #include <JuceHeader.h>
@@ -79,8 +88,9 @@ private:
     Sid* sid;
     LedIndicator led; 
     juce::Image backgroundImage;
-    juce::Time lastMidiDataTime;  // Speichert den Zeitpunkt des letzten MIDI-Daten-Eingangs
-
+    juce::Time lastMidiDataTime0;  // Speichert den Zeitpunkt des letzten MIDI-Daten-Eingangs
+    juce::Time lastMidiDataTime1;
+    juce::Time lastMidiDataTime2;
     juce::CriticalSection midiMonitorLock;
     juce::Array<juce::MidiMessage> incomingMessages;
 

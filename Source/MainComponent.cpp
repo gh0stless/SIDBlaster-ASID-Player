@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.2.0
+// Version 0.5.0
 
 #include "MainComponent.h"
 
@@ -49,7 +49,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.2.0 (alpha)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.0 (alpha)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
         
     sid = new Sid();
@@ -70,23 +70,10 @@ MainComponent::MainComponent()
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
     }
-    //// Some platforms require permissions to open input channels so request that here
-    //if (juce::RuntimePermissions::isRequired(juce::RuntimePermissions::recordAudio)
-    //    && !juce::RuntimePermissions::isGranted(juce::RuntimePermissions::recordAudio))
-    //{
-    //    juce::RuntimePermissions::request(juce::RuntimePermissions::recordAudio,
-    //        [&](bool granted) { setAudioChannels(granted ? 2 : 0, 2); });
-    //}
-    //else
-    //{
-    //    // Specify the number of input and output channels that we want to open
-    //    setAudioChannels(0, 2);
-    //}
-}
+ }
 
 MainComponent::~MainComponent()
 {
-    //shutdownAudio();
     // MIDI Input stoppen, wenn die Komponente zerstört wird
     if (midiInput != nullptr)
     {
@@ -127,36 +114,6 @@ void MainComponent::resized()
     outputTextBox.setBounds(10, 70, juce::Component::getWidth() - 20, juce::Component::getHeight() - 80); // TextEditor für Ausgaben
 }
 
-//void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
-//{
-//    // This function will be called when the audio device is started, or when
-//    // its settings (i.e. sample rate, block size, etc) are changed.
-//
-//    // You can use this function to initialise any resources you might need,
-//    // but be careful - it will be called on the audio thread, not the GUI thread.
-//
-//    // For more details, see the help for AudioProcessor::prepareToPlay()
-//}
-//
-//void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
-//{
-//    // Your audio-processing code goes here!
-//
-//    // For more details, see the help for AudioProcessor::getNextAudioBlock()
-//
-//    // Right now we are not producing any data, in which case we need to clear the buffer
-//    // (to prevent the output of random noise)
-//    bufferToFill.clearActiveBufferRegion();
-//}
-//
-//void MainComponent::releaseResources()
-//{
-//    // This will be called when the audio device stops, or when it is being
-//    // restarted due to a setting change.
-//
-//    // For more details, see the help for AudioProcessor::releaseResources()
-//}
-
 void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message)
 {
     if (message.isSysEx())
@@ -177,7 +134,7 @@ void MainComponent::handleAsyncUpdate() {
         messages.swapWith(incomingMessages);
     }
 
-    lastMidiDataTime = juce::Time::getCurrentTime();
+    lastMidiDataTime0 = juce::Time::getCurrentTime();
     
     // Durchlaufe alle empfangenen MIDI-Nachrichten
     for (const auto& message : messages)
@@ -199,7 +156,7 @@ void MainComponent::handleAsyncUpdate() {
 
                         if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
                             if (!Msg1Mem) {
-                                //sid->startPlayerThread();
+                                lastMidiDataTime0 = juce::Time::getCurrentTime();
                                 outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
                                 startTimer(500);
                                 Msg1Mem = true;
@@ -207,17 +164,17 @@ void MainComponent::handleAsyncUpdate() {
                             sid->push_event(0, address, register_value);
                         }
                         if ((data[1] == 80) && (sid->Number_Of_Devices > 1)) {
+                            lastMidiDataTime1 = juce::Time::getCurrentTime();
                             if (!Msg2Mem) {
-                                outputTextBox.insertTextAtCaret("2SID data recived, not supported\n");
-
+                                outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
                                 Msg2Mem = true;
                             }
                             sid->push_event(1, address, register_value);
                         }
                         if ((data[1] == 81) && (sid->Number_Of_Devices > 2)) {
+                            lastMidiDataTime2 = juce::Time::getCurrentTime();
                             if (!Msg3Mem) {
-                                outputTextBox.insertTextAtCaret("3SID data recived, not supported\n");
-
+                                outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
                                 Msg3Mem = true;
                             }
                             sid->push_event(2, address, register_value);
@@ -296,14 +253,30 @@ void MainComponent::timerCallback()
     }
     // MIDI-Daten-Timeout-Logik
     auto currentTime = juce::Time::getCurrentTime();
-    auto timeSinceLastMidi = currentTime - lastMidiDataTime;
+    auto timeSinceLastMidi0 = currentTime - lastMidiDataTime0;
+    auto timeSinceLastMidi1 = currentTime - lastMidiDataTime1;
+    auto timeSinceLastMidi2 = currentTime - lastMidiDataTime2;
 
-    if (timeSinceLastMidi.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
+    if (timeSinceLastMidi0.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
-        //sid->stopPlayerThread();
-        outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
-        stopTimer();
-        Msg1Mem = false;
+        if (Msg1Mem) {
+            outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
+            Msg1Mem = false;
+        }
+    }
+    if (timeSinceLastMidi1.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
+    {
+        if (Msg2Mem) {
+            outputTextBox.insertTextAtCaret("no more 2SID data, stop playing\n");
+            Msg2Mem = false;
+        }
+    }
+    if (timeSinceLastMidi2.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
+    {
+        if (Msg3Mem) {
+            outputTextBox.insertTextAtCaret("no more 3SID data, stop playing\n");
+            Msg3Mem = false;
+        }
     }
 }
 
