@@ -3,10 +3,12 @@
 <JUCERPROJECT id="TIT5TR" name="SIDBlaster ASID Player" projectType="guiapp"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
               companyName="crazy-midi.de" companyWebsite="www.crazy-midi.de"
-              companyEmail="info@crazy-midi.de" headerPath="Source" version="0.5.0"
+              companyEmail="info@crazy-midi.de" headerPath="Source" version="0.5.1"
               bundleIdentifier="com.crazymidi.sidblasterasidplayer">
   <MAINGROUP id="iRcPnY" name="SIDBlaster ASID Player">
     <GROUP id="{B2ADDEAA-F2C0-E353-BBC5-F5219FB38A7C}" name="Source">
+      <FILE id="jvUoKo" name="red-led-off.png" compile="0" resource="1" file="Source/red-led-off.png"/>
+      <FILE id="MmMu0I" name="red-led-on.png" compile="0" resource="1" file="Source/red-led-on.png"/>
       <FILE id="EfPDEd" name="CrazyMidi_grau_128x128.png" compile="0" resource="1"
             file="Source/CrazyMidi_grau_128x128.png"/>
       <FILE id="b39JQN" name="SIDWriteThread.h" compile="0" resource="0"

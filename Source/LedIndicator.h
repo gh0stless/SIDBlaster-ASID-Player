@@ -14,7 +14,11 @@
 class LedIndicator : public juce::Component, public juce::Timer
 {
 public:
-    LedIndicator() {}
+    LedIndicator() {
+        // Lade die Bilder aus den Ressourcen (im Projucer eingebunden)
+        ledOffImage = juce::ImageFileFormat::loadFrom(BinaryData::redledoff_png, BinaryData::redledoff_pngSize);
+        ledOnImage = juce::ImageFileFormat::loadFrom(BinaryData::redledon_png, BinaryData::redledon_pngSize);
+    }
     ~LedIndicator() override {}
 
     // Setzt den Zustand der LED und aktualisiert die Anzeige
@@ -36,24 +40,16 @@ public:
             stopTimer(); // Timer stoppen
     }
 
-    // Setzt den Blinkzustand der LED
-    void setBlinkingGreen(bool state)
-    {
-        isBlinking = state;
-        blinkColour = juce::Colours::green;
-        if (state)
-
-            startTimer(500); // Timer starten
-        else
-            stopTimer(); // Timer stoppen
-    }
-
-    // Überschreibt die paint-Methode, um die LED zu zeichnen
+    // Überschreibt die paint-Methode, um die LED als Bild anzuzeigen
     void paint(juce::Graphics& g) override
     {
-        // Wähle die entsprechende Farbe basierend auf dem Blinkzustand
-        g.setColour(isOn ? blinkColour : juce::Colours::transparentBlack);
-        g.fillEllipse(getLocalBounds().toFloat());
+        auto bounds = getLocalBounds().toFloat();
+        if (isOn && ledOnImage.isValid()) {
+            g.drawImage(ledOnImage, bounds);  // Zeichnet das „LED an“-Bild
+        }
+        else if (!isOn && ledOffImage.isValid()) {
+            g.drawImage(ledOffImage, bounds);  // Zeichnet das „LED aus“-Bild
+        }
     }
 
     // Timer-Callback für das Blinken
@@ -69,6 +65,9 @@ public:
     bool isOnState() const { return isOn; }
 
 private:
+
+    juce::Image ledOffImage;
+    juce::Image ledOnImage;
     bool isOn = false;         // Status der LED
     bool isBlinking = false;   // Blinkzustand der LED
     juce::Colour blinkColour;  // Farbe der blinkenden LED (rot oder grün)
