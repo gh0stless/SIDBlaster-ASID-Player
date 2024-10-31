@@ -34,9 +34,9 @@ public:
                 else { // wenn der Puffer leer ist
                     HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); //mache nichts
                 }
-                //juce::Thread::sleep(1);  // Kleiner Sleep, um die CPU-Belastung zu senken
+                
             }
-
+            //juce::Thread::sleep(1);  // Kleiner Sleep, um die CPU-Belastung zu senken
         }
     }
 
@@ -54,7 +54,7 @@ public:
 
 private:
     const int LOOP_TIME_OUT_MILLIS = 500;  // Timeout in Millisekunden
-    const int cycles = 8 ;
+    const int cycles = 4;
     SIDWriteSet value ;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer0;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer1;
