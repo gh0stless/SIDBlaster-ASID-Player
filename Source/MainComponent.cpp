@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.5.1 beta
+// Version 0.5.2 beta
 
 #include "MainComponent.h"
 
@@ -11,7 +11,7 @@ MainComponent::MainComponent()
     
     juce::Component::addAndMakeVisible(led);
     led.setBlinkingRed(false); 
-    led.setOn(true); // LED einschalten
+    led.setOn(false); // LED ausschalten
 
     juce::Component::addAndMakeVisible(midiDeviceSelector);
     midiDeviceSelector.addListener(this);
@@ -30,7 +30,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.1 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.2 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -162,6 +162,7 @@ void MainComponent::handleAsyncUpdate() {
                                 outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
                                 startTimer(500);
                                 Msg1Mem = true;
+                                led.setOn(true);
                             }
                             sid->push_event(0, address, register_value);
                         }
@@ -171,6 +172,7 @@ void MainComponent::handleAsyncUpdate() {
                                 if (!Msg2Mem) {
                                     outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
                                     Msg2Mem = true;
+                                    led.setOn(true);
                                 }
                                 sid->push_event(1, address, register_value);
                             }
@@ -188,6 +190,8 @@ void MainComponent::handleAsyncUpdate() {
                                 if (!Msg3Mem) {
                                     outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
                                     Msg3Mem = true;
+                                    led.setOn(true);
+
                                 }
                                 sid->push_event(2, address, register_value);
                             }
@@ -283,6 +287,7 @@ void MainComponent::timerCallback()
             outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
             Msg1Mem = false;
         }
+        if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
     }
     if (timeSinceLastMidi1.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
@@ -290,6 +295,7 @@ void MainComponent::timerCallback()
             outputTextBox.insertTextAtCaret("no more 2SID data, stop playing\n");
             Msg2Mem = false;
         }
+        if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
     }
     if (timeSinceLastMidi2.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
@@ -297,6 +303,7 @@ void MainComponent::timerCallback()
             outputTextBox.insertTextAtCaret("no more 3SID data, stop playing\n");
             Msg3Mem = false;
         }
+        if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
     }
 }
 
