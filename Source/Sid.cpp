@@ -15,7 +15,7 @@
 Sid::Sid() : ringBuffer0(MY_BUFFER_SIZE),
 ringBuffer1(MY_BUFFER_SIZE),
 ringBuffer2(MY_BUFFER_SIZE),
-playerThread(ringBuffer0, ringBuffer1, ringBuffer2, Number_Of_Devices)
+playerThread(ringBuffer0, ringBuffer1, ringBuffer2, No_Of_Playing_Devices)
 {
 	#if defined(_WIN32) || defined(_WIN64)
 		// Ermitteln des Programmverzeichnisses

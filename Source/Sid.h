@@ -11,6 +11,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "hardsid.h"
+#include "Mutex.h"
 
 struct SIDWriteSet {
 	Uint8 SIDRegister;
@@ -51,6 +52,7 @@ class Sid {
 
 		int error_state = 0;
 		int Number_Of_Devices = 0;
+		//int Number_Of_Playing_Devices = 0;
 		
 	private:	
 

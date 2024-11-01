@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.5.4 beta
+// Version 0.5.5 beta
 
 #include "MainComponent.h"
 
@@ -30,7 +30,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.4 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.5 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -61,8 +61,10 @@ MainComponent::MainComponent()
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
     }
     else {
-        sid->startPlayerThread();
+        
         if (sid->Number_Of_Devices > 3) sid->Number_Of_Devices = 3; // *** Wir benutzen nur max. drei Sidblaster
+        updateNoOfPlayingDevices(sid->Number_Of_Devices);
+        sid->startPlayerThread();
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
             sid->init(i);
             auto SIDTYPE = sid->GetSidType(i);
@@ -71,6 +73,7 @@ MainComponent::MainComponent()
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
+        updateNoOfPlayingDevices(0);
     }
  }
 
@@ -82,10 +85,12 @@ MainComponent::~MainComponent()
         midiInput->stop();
         midiInput = nullptr;
     }
-    
+    updateNoOfPlayingDevices(sid->Number_Of_Devices);
     for (int i = 0; i < sid->Number_Of_Devices; i++) {
         sid->init(i);
     }
+    updateNoOfPlayingDevices(0);
+
     sid->stopPlayerThread();
     delete sid;
     saveComboBoxSelection(); // Speichere die Auswahl beim Beenden der Anwendung  
@@ -163,6 +168,7 @@ void MainComponent::handleAsyncUpdate() {
                                 startTimer(500);
                                 Msg1Mem = true;
                                 led.setOn(true);
+                                if (!Msg2Mem && !Msg3Mem)updateNoOfPlayingDevices(1);
                             }
                             sid->push_event(0, address, register_value);
                         }
@@ -173,6 +179,7 @@ void MainComponent::handleAsyncUpdate() {
                                     outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
                                     Msg2Mem = true;
                                     led.setOn(true);
+                                    if (!Msg3Mem) updateNoOfPlayingDevices(2);
                                 }
                                 sid->push_event(1, address, register_value);
                             }
@@ -191,7 +198,7 @@ void MainComponent::handleAsyncUpdate() {
                                     outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
                                     Msg3Mem = true;
                                     led.setOn(true);
-
+                                    updateNoOfPlayingDevices(3);
                                 }
                                 sid->push_event(2, address, register_value);
                             }
@@ -286,6 +293,7 @@ void MainComponent::timerCallback()
         if (Msg1Mem) {
             outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
             Msg1Mem = false;
+            if (!Msg2Mem && !Msg3Mem) updateNoOfPlayingDevices(0);
         }
         if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
     }
@@ -294,6 +302,8 @@ void MainComponent::timerCallback()
         if (Msg2Mem) {
             outputTextBox.insertTextAtCaret("no more 2SID data, stop playing\n");
             Msg2Mem = false;
+            if (Msg1Mem && !Msg3Mem) updateNoOfPlayingDevices(1);
+            if (!Msg1Mem && !Msg3Mem) updateNoOfPlayingDevices(0);
         }
         if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
     }
@@ -302,6 +312,9 @@ void MainComponent::timerCallback()
         if (Msg3Mem) {
             outputTextBox.insertTextAtCaret("no more 3SID data, stop playing\n");
             Msg3Mem = false;
+            if (Msg1Mem || Msg2Mem) updateNoOfPlayingDevices(2);
+            if (!Msg1Mem && !Msg2Mem) updateNoOfPlayingDevices(0);
+            if (Msg1Mem && !Msg2Mem) updateNoOfPlayingDevices(1);
         }
         if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
     }
@@ -335,4 +348,10 @@ void MainComponent::loadComboBoxSelection(){
             midiDeviceSelector.setSelectedId(selectedDeviceId);
         }
     }
+}
+
+void MainComponent::updateNoOfPlayingDevices(int newCount)
+{
+    juce::ScopedLock lock(noOfPlayingDevicesMutex); // Sperrt den CriticalSection
+    No_Of_Playing_Devices = newCount;                  // Schreibzugriff
 }

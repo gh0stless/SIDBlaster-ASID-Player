@@ -12,13 +12,20 @@
 class SIDWriteThread : public juce::Thread {
 
 public:
-    SIDWriteThread(ThreadSafeRingBuffer<SIDWriteSet>& buffer0, ThreadSafeRingBuffer<SIDWriteSet>& buffer1, ThreadSafeRingBuffer<SIDWriteSet>& buffer2, int& noofdevices)
-        : Thread("SIDWriteThread"), ringBuffer0(buffer0), ringBuffer1(buffer1), ringBuffer2(buffer2), NoOfDevices(noofdevices) {}
+    SIDWriteThread(ThreadSafeRingBuffer<SIDWriteSet>& buffer0, ThreadSafeRingBuffer<SIDWriteSet>& buffer1, ThreadSafeRingBuffer<SIDWriteSet>& buffer2, int& noofplayingdevices)
+        : Thread("SIDWriteThread"), ringBuffer0(buffer0), ringBuffer1(buffer1), ringBuffer2(buffer2), NoOfPlayingDevices(noofplayingdevices) {}
     void run() override {
         setPriority(juce::Thread::Priority::highest);
         while (!threadShouldExit()) {
-           
-            for (auto i = 0; i < NoOfDevices; i++) {
+
+            juce::ScopedLock lock(noOfPlayingDevicesMutex);
+            auto PlayingDevices = NoOfPlayingDevices;
+            
+            if (PlayingDevices == 0) { // do nothing if player idle
+                    HardSID_WriteWithTimeout(0, 312 * 63 * 50, 0x1e, 0);
+            }
+
+            for (auto i = 0; i < PlayingDevices; i++) {
                 bool cie = false;
                 switch (i) {
                 case 0:  cie = ringBuffer0.remove(value);
@@ -28,12 +35,13 @@ public:
                 case 2:  cie = ringBuffer2.remove(value);
                     break;
                 }
+
                 if (cie) {
                     HardSID_WriteWithTimeout(i, cycles, value.SIDRegister, value.SIDData);
                 }
-                else { // wenn der Puffer leer ist
-                    HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); //mache nichts
-                }    
+                else { // buffer empty
+                    HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); // do nothing
+                }
             }
         }
     }
@@ -47,7 +55,7 @@ public:
                 return false;
             }
         }
-        return true;  // Schreibvorgang erfolgreich
+        return true;
     }
 
 private:
@@ -57,5 +65,6 @@ private:
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer0;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer1;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer2;
-    int& NoOfDevices;
+    int& NoOfPlayingDevices;
+    
 };

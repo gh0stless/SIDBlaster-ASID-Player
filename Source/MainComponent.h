@@ -12,6 +12,7 @@
 #include <JuceHeader.h>
 #include "Sid.h" 
 #include "LedIndicator.h" 
+#include "Mutex.h"
 
 /* SID Register order for ASID */
 static const uint8_t asid_sid_registers[] =
@@ -75,6 +76,7 @@ private:
     void timerCallback() override; 
     void saveComboBoxSelection(); 
     void loadComboBoxSelection(); 
+    void MainComponent::updateNoOfPlayingDevices(int newCount);
 
     bool Msg1Mem = false;
     bool Msg2Mem = false;
