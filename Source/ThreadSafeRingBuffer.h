@@ -40,7 +40,7 @@ public:
 
     // Check if the buffer is empty
     bool isEmpty() const {
-        juce::ScopedLock lock(mutex);
+        //juce::ScopedLock lock(mutex);
         return (!isFull && (head == tail));
     }
 
