@@ -18,11 +18,12 @@ public:
         setPriority(juce::Thread::Priority::highest);
         while (!threadShouldExit()) {
 
-            juce::ScopedLock lock(noOfPlayingDevicesMutex);
+            //juce::ScopedLock lock(noOfPlayingDevicesMutex);
             auto PlayingDevices = NoOfPlayingDevices;
             
             if (PlayingDevices == 0) { // do nothing if player idle
-                    HardSID_WriteWithTimeout(0, 312 * 63 * 50, 0x1e, 0);
+                HardSID_WriteWithTimeout(0, 312 * 63 * 50, 0x1e, 0);// There is at least one device present,
+                                                                    // otherwise the PlayThread would not have started
             }
 
             for (auto i = 0; i < PlayingDevices; i++) {
@@ -65,6 +66,6 @@ private:
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer0;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer1;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer2;
+    //int& NoOfPlayingDevices;
     int& NoOfPlayingDevices;
-    
 };

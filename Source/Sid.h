@@ -36,6 +36,7 @@ enum SID_TYPE {
 
 #include "ThreadSafeRingBuffer.h"
 #include "SIDWriteThread.h"
+//#include <atomic>
 
 //==============================================================================
 
@@ -53,7 +54,7 @@ class Sid {
 		int error_state = 0;
 		int Number_Of_Devices = 0;
 		//int Number_Of_Playing_Devices = 0;
-		
+		//int No_Of_Playing_Devices = 0;
 	private:	
 
         typedef Uint16  (*lpHardSID_Version)(void);

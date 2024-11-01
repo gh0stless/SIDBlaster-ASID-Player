@@ -52,8 +52,7 @@ MainComponent::MainComponent()
             midiInput->start();
         }
     }
-
-        
+            
     sid = new Sid();
     outputTextBox.insertTextAtCaret("DLL Version: " +  juce::String(sid->GetDLLVersion()) + "\n");
     if (sid->error_state) {
@@ -61,10 +60,10 @@ MainComponent::MainComponent()
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
     }
     else {
-        
         if (sid->Number_Of_Devices > 3) sid->Number_Of_Devices = 3; // *** Wir benutzen nur max. drei Sidblaster
         updateNoOfPlayingDevices(sid->Number_Of_Devices);
         sid->startPlayerThread();
+        juce::Thread::sleep(500);
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
             sid->init(i);
             auto SIDTYPE = sid->GetSidType(i);
@@ -73,6 +72,7 @@ MainComponent::MainComponent()
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
+        juce::Thread::sleep(500);
         updateNoOfPlayingDevices(0);
     }
  }
@@ -352,6 +352,6 @@ void MainComponent::loadComboBoxSelection(){
 
 void MainComponent::updateNoOfPlayingDevices(int newCount)
 {
-    juce::ScopedLock lock(noOfPlayingDevicesMutex); // Sperrt den CriticalSection
+    //juce::ScopedLock lock(noOfPlayingDevicesMutex); // Sperrt den CriticalSection
     No_Of_Playing_Devices = newCount;                  // Schreibzugriff
 }

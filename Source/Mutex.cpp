@@ -10,5 +10,5 @@
 
 #include "Mutex.h"
 
-juce::CriticalSection noOfPlayingDevicesMutex;
+//juce::CriticalSection noOfPlayingDevicesMutex;
 int No_Of_Playing_Devices = 0;
