@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.5.5 beta
+// Version 0.5.6 beta
 
 #include "MainComponent.h"
 
@@ -30,7 +30,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.5 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.6 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -60,10 +60,12 @@ MainComponent::MainComponent()
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
     }
     else {
+        
         if (sid->Number_Of_Devices > 3) sid->Number_Of_Devices = 3; // *** Wir benutzen nur max. drei Sidblaster
-        updateNoOfPlayingDevices(sid->Number_Of_Devices);
         sid->startPlayerThread();
-        juce::Thread::sleep(500);
+        while (!sid->isPlayerThreadRuning()) { ; }
+        updateNoOfPlayingDevices(sid->Number_Of_Devices);
+        //juce::Thread::sleep(250);
         for (int i = 0; i < sid->Number_Of_Devices; i++) {
             sid->init(i);
             auto SIDTYPE = sid->GetSidType(i);
@@ -72,7 +74,7 @@ MainComponent::MainComponent()
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
-        juce::Thread::sleep(500);
+        //juce::Thread::sleep(250);
         updateNoOfPlayingDevices(0);
     }
  }
@@ -313,8 +315,8 @@ void MainComponent::timerCallback()
             outputTextBox.insertTextAtCaret("no more 3SID data, stop playing\n");
             Msg3Mem = false;
             if (Msg1Mem || Msg2Mem) updateNoOfPlayingDevices(2);
-            if (!Msg1Mem && !Msg2Mem) updateNoOfPlayingDevices(0);
             if (Msg1Mem && !Msg2Mem) updateNoOfPlayingDevices(1);
+            if (!Msg1Mem && !Msg2Mem) updateNoOfPlayingDevices(0);
         }
         if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
     }
@@ -353,5 +355,5 @@ void MainComponent::loadComboBoxSelection(){
 void MainComponent::updateNoOfPlayingDevices(int newCount)
 {
     //juce::ScopedLock lock(noOfPlayingDevicesMutex); // Sperrt den CriticalSection
-    No_Of_Playing_Devices = newCount;                  // Schreibzugriff
+    No_Of_Playing_Devices.set(newCount);                  // Schreibzugriff
 }

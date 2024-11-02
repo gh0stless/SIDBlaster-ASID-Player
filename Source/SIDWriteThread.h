@@ -12,20 +12,22 @@
 class SIDWriteThread : public juce::Thread {
 
 public:
-    SIDWriteThread(ThreadSafeRingBuffer<SIDWriteSet>& buffer0, ThreadSafeRingBuffer<SIDWriteSet>& buffer1, ThreadSafeRingBuffer<SIDWriteSet>& buffer2, int& noofplayingdevices)
-        : Thread("SIDWriteThread"), ringBuffer0(buffer0), ringBuffer1(buffer1), ringBuffer2(buffer2), NoOfPlayingDevices(noofplayingdevices) {}
+    SIDWriteThread( ThreadSafeRingBuffer<SIDWriteSet>& buffer0,
+                    ThreadSafeRingBuffer<SIDWriteSet>& buffer1,
+                    ThreadSafeRingBuffer<SIDWriteSet>& buffer2,
+                    juce::Atomic<int>& noofplayingdevices)
+      : Thread("SIDWriteThread"),
+        ringBuffer0(buffer0),
+        ringBuffer1(buffer1),
+        ringBuffer2(buffer2),
+        NoOfPlayingDevices(noofplayingdevices) {}
+
     void run() override {
         setPriority(juce::Thread::Priority::highest);
         while (!threadShouldExit()) {
 
-            //juce::ScopedLock lock(noOfPlayingDevicesMutex);
-            auto PlayingDevices = NoOfPlayingDevices;
+            PlayingDevices = NoOfPlayingDevices.get();
             
-            if (PlayingDevices == 0) { // do nothing if player idle
-                HardSID_WriteWithTimeout(0, 312 * 63 * 50, 0x1e, 0);// There is at least one device present,
-                                                                    // otherwise the PlayThread would not have started
-            }
-
             for (auto i = 0; i < PlayingDevices; i++) {
                 bool cie = false;
                 switch (i) {
@@ -44,6 +46,10 @@ public:
                     HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); // do nothing
                 }
             }
+            if (!PlayingDevices) { // do nothing if player idle
+                HardSID_WriteWithTimeout(0, 312 * 63 * 50, 0x1e, 0);// There is at least one device present,
+                // otherwise the PlayThread would not have started
+            }
         }
     }
 
@@ -60,12 +66,12 @@ public:
     }
 
 private:
-    const int LOOP_TIME_OUT_MILLIS = 500;  // Timeout in Millisekunden
+    const int LOOP_TIME_OUT_MILLIS = 500;
     const int cycles = 8;
     SIDWriteSet value ;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer0;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer1;
     ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer2;
-    //int& NoOfPlayingDevices;
-    int& NoOfPlayingDevices;
+    juce::Atomic<int>& NoOfPlayingDevices;
+    int PlayingDevices = 0;
 };

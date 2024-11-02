@@ -14,5 +14,5 @@
 
 
 //extern juce::CriticalSection noOfPlayingDevicesMutex;
-extern int No_Of_Playing_Devices;
- // Referenz auf die atomare Variable
+//extern int No_Of_Playing_Devices;
+extern juce::Atomic<int> No_Of_Playing_Devices;

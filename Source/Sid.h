@@ -50,6 +50,7 @@ class Sid {
 		void push_event(int device, Uint8 reg, Uint8 val);
 		void startPlayerThread(void);
 		void stopPlayerThread(void);
+		bool isPlayerThreadRuning(void);
 
 		int error_state = 0;
 		int Number_Of_Devices = 0;

@@ -9,13 +9,20 @@
 */
 
 #include "Sid.h"
-
+//#include "MainComponent.h"
 //------------------------------------------------------------------------------
+
+
+
 
 Sid::Sid() : ringBuffer0(MY_BUFFER_SIZE),
 ringBuffer1(MY_BUFFER_SIZE),
 ringBuffer2(MY_BUFFER_SIZE),
-playerThread(ringBuffer0, ringBuffer1, ringBuffer2, No_Of_Playing_Devices)
+playerThread(ringBuffer0,
+	ringBuffer1,
+	ringBuffer2,
+	//noOfPlayingDevicesMutex,
+	No_Of_Playing_Devices)
 {
 	#if defined(_WIN32) || defined(_WIN64)
 		// Ermitteln des Programmverzeichnisses
@@ -63,12 +70,15 @@ Sid::~Sid() {
 }
 
 //------------------------------------------------------------------------------
+
 	int Sid::GetDLLVersion(void) {
 		return (int)My_HardSID_Version();
 	}
+
 	int Sid::GetSidType(int device) {
 		return	My_HardSID_GetSIDType(device);
 	}
+
 	void Sid::init(int device) {
 		if (!error_state) {
 
@@ -85,6 +95,7 @@ Sid::~Sid() {
 			}
 		}
 	}
+
 	void Sid::push_event(int device, Uint8 reg, Uint8 val) {
 		switch(device) {
 		case 0: ringBuffer0.add({ reg, val });
@@ -95,16 +106,22 @@ Sid::~Sid() {
 			break;
 		}
 	}
+
 	void Sid::startPlayerThread(void) {
 			if (!playerThread.isThreadRunning()) {
 				playerThread.startThread();
 			}
 		
 	}
+
 	void Sid::stopPlayerThread(void) {
 
 			if (playerThread.isThreadRunning()) {
 				playerThread.signalThreadShouldExit();
 				playerThread.waitForThreadToExit(1000);
 			}
+	}
+
+	bool Sid::isPlayerThreadRuning(void) {
+		return playerThread.isThreadRunning();
 	}

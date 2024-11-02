@@ -68,6 +68,8 @@ public:
     void resized() override;
     //==============================================================================
     void setErrorState(bool hasError); 
+    //juce::CriticalSection noOfPlayingDevicesMutex;
+    //int No_Of_Playing_Devices = 0;
  
 private:
     void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
