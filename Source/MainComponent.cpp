@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.5.7 beta
+// Version 0.6.0 beta
 
 #include "MainComponent.h"
 
@@ -30,7 +30,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.5.7 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.6.0 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -162,55 +162,59 @@ void MainComponent::handleAsyncUpdate() {
                             register_value |= 0x80;  /* the register_value needs its 8th MSB bit */
                         }
                         uint8_t address = asid_sid_registers[mask * 7 + bit];
-
-                        if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
-                            if (!Msg1Mem) {
-                                lastMidiDataTime0 = juce::Time::getCurrentTime();
-                                outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
-                                startTimer(500);
-                                Msg1Mem = true;
-                                led.setOn(true);
-                                if (!Msg2Mem && !Msg3Mem)updateNoOfPlayingDevices(1);
-                            }
-                            sid->push_event(0, address, register_value);
-                        }
-                        if (data[1] == 80) {
-                            if (sid->Number_Of_Devices > 1) {
-                                lastMidiDataTime1 = juce::Time::getCurrentTime();
-                                if (!Msg2Mem) {
-                                    outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
-                                    Msg2Mem = true;
+                        if (address <= NUMSIDREGS) {
+                            if ((data[1] == 78) && (sid->Number_Of_Devices > 0)) {
+                                if (!Msg1Mem) {
+                                    lastMidiDataTime0 = juce::Time::getCurrentTime();
+                                    outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
+                                    startTimer(500);
+                                    Msg1Mem = true;
                                     led.setOn(true);
-                                    if (!Msg3Mem) updateNoOfPlayingDevices(2);
+                                    if (!Msg2Mem && !Msg3Mem)updateNoOfPlayingDevices(1);
                                 }
-                                sid->push_event(1, address, register_value);
+                                sid->push_event(0, address, register_value);
                             }
-                            else {
-                                lastMidiDataTime1 = juce::Time::getCurrentTime();
-                                if (!Msg2Mem) {
-                                    outputTextBox.insertTextAtCaret("You need more SIDBlasters for 2SID\n");
-                                    Msg2Mem = true;
+                            if (data[1] == 80) {
+                                if (sid->Number_Of_Devices > 1) {
+                                    lastMidiDataTime1 = juce::Time::getCurrentTime();
+                                    if (!Msg2Mem) {
+                                        outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
+                                        Msg2Mem = true;
+                                        led.setOn(true);
+                                        if (!Msg3Mem) updateNoOfPlayingDevices(2);
+                                    }
+                                    sid->push_event(1, address, register_value);
+                                }
+                                else {
+                                    lastMidiDataTime1 = juce::Time::getCurrentTime();
+                                    if (!Msg2Mem) {
+                                        outputTextBox.insertTextAtCaret("You need more SIDBlasters for 2SID\n");
+                                        Msg2Mem = true;
+                                    }
+                                }
+                            }
+                            if (data[1] == 81) {
+                                if (sid->Number_Of_Devices > 2) {
+                                    lastMidiDataTime2 = juce::Time::getCurrentTime();
+                                    if (!Msg3Mem) {
+                                        outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
+                                        Msg3Mem = true;
+                                        led.setOn(true);
+                                        updateNoOfPlayingDevices(3);
+                                    }
+                                    sid->push_event(2, address, register_value);
+                                }
+                                else {
+                                    lastMidiDataTime2 = juce::Time::getCurrentTime();
+                                    if (!Msg3Mem) {
+                                        outputTextBox.insertTextAtCaret("You need more SIDBlasters for 3SID\n");
+                                        Msg3Mem = true;
+                                    }
                                 }
                             }
                         }
-                        if (data[1] == 81) {
-                            if (sid->Number_Of_Devices > 2) {
-                                lastMidiDataTime2 = juce::Time::getCurrentTime();
-                                if (!Msg3Mem) {
-                                    outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
-                                    Msg3Mem = true;
-                                    led.setOn(true);
-                                    updateNoOfPlayingDevices(3);
-                                }
-                                sid->push_event(2, address, register_value);
-                            }
-                            else {
-                                lastMidiDataTime2 = juce::Time::getCurrentTime();
-                                if (!Msg3Mem) {
-                                    outputTextBox.insertTextAtCaret("You need more SIDBlasters for 3SID\n");
-                                    Msg3Mem = true;
-                                }
-                            }
+                        else {
+                            outputTextBox.insertTextAtCaret("incorrect data resived\n");
                         }
                         reg++;
                     }
@@ -301,7 +305,7 @@ void MainComponent::timerCallback()
     }
     if (timeSinceLastMidi1.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
-        if (Msg2Mem) {
+        if (Msg2Mem && (sid->Number_Of_Devices > 1)) {
             outputTextBox.insertTextAtCaret("no more 2SID data, stop playing\n");
             Msg2Mem = false;
             if (Msg1Mem && !Msg3Mem) updateNoOfPlayingDevices(1);
@@ -311,7 +315,7 @@ void MainComponent::timerCallback()
     }
     if (timeSinceLastMidi2.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
-        if (Msg3Mem) {
+        if (Msg3Mem && (sid->Number_Of_Devices > 2)) {
             outputTextBox.insertTextAtCaret("no more 3SID data, stop playing\n");
             Msg3Mem = false;
             if (Msg1Mem || Msg2Mem) updateNoOfPlayingDevices(2);

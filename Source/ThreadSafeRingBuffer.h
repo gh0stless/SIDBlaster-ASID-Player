@@ -16,6 +16,7 @@ public:
 
     // Füge ein neues Element zum Ringpuffer hinzu
     void add(const T& value) {
+        juce::ScopedLock lock(mutex); // Sperrt den Zugriff während der add-Operation
         const int currentHead = head.get();
         buffer[currentHead] = value;
 
@@ -33,6 +34,7 @@ public:
 
     // Entferne ein Element aus dem Ringpuffer
     bool remove(T& value) {
+        juce::ScopedLock lock(mutex); // Sperrt den Zugriff während der remove-Operation
         if (isEmpty()) {
             return false;
         }
@@ -48,6 +50,7 @@ public:
 
     // Überprüfe, ob der Buffer leer ist
     bool isEmpty() const {
+        juce::ScopedLock lock(mutex); // Sperrt den Zugriff während der Überprüfung
         return (!isFull.get() && (head.get() == tail.get()));
     }
 
@@ -56,4 +59,5 @@ private:
     juce::Atomic<int> head{ 0 };              // Atomarer Kopfzeiger
     juce::Atomic<int> tail{ 0 };              // Atomarer Schwanzzeiger
     juce::Atomic<bool> isFull{ false };       // Atomarer Status, ob der Puffer voll ist
+    mutable juce::CriticalSection mutex;      // Mutex für die Synchronisation
 };

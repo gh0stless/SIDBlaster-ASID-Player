@@ -12,7 +12,4 @@
 
 #include <juce_core/juce_core.h>
 
-
-//extern juce::CriticalSection noOfPlayingDevicesMutex;
-//extern int No_Of_Playing_Devices;
 extern juce::Atomic<int> No_Of_Playing_Devices;

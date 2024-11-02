@@ -21,7 +21,6 @@ ringBuffer2(),
 playerThread(ringBuffer0,
 	ringBuffer1,
 	ringBuffer2,
-	//noOfPlayingDevicesMutex,
 	No_Of_Playing_Devices)
 {
 	#if defined(_WIN32) || defined(_WIN64)
