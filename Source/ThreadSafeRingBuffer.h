@@ -1,21 +1,29 @@
-#include <JuceHeader.h>
-#include <vector>
+/*
+  ==============================================================================
 
-template <typename T>
+    ThreadSafeRingBuffer.h
+    Created: 22 Oct 2024 10:28:42am
+    Author:  andre
+
+  ==============================================================================
+*/
+#include <JuceHeader.h>
+
+template <typename T, int BufferSize>
 class ThreadSafeRingBuffer {
 public:
-    explicit ThreadSafeRingBuffer(int size)
-        : buffer(size), maxSize(size), head(0), tail(0), isFull(false) {}
+    ThreadSafeRingBuffer() {}
 
-    // Add a new value to the ring buffer
+    // Füge ein neues Element zum Ringpuffer hinzu
     void add(const T& value) {
-        juce::ScopedLock lock(mutex);
+        const int currentHead = head.get();
+        buffer[currentHead] = value;
 
-        buffer[head.get()] = value;
-        head = (head.get() + 1) % maxSize;
+        head = (currentHead + 1) % BufferSize;
 
-        if (head.get() == tail.get()) {  // Buffer ist voll
-            tail = (tail.get() + 1) % maxSize;
+        // Wenn Kopf den Schwanz überschreibt, verschiebt sich der Schwanz
+        if (head.get() == tail.get()) {
+            tail = (tail.get() + 1) % BufferSize;
             isFull = true;
         }
         else {
@@ -23,30 +31,29 @@ public:
         }
     }
 
-    // Remove an item from the ring buffer
+    // Entferne ein Element aus dem Ringpuffer
     bool remove(T& value) {
-        juce::ScopedLock lock(mutex);
         if (isEmpty()) {
             return false;
         }
 
-        value = buffer[tail.get()];
-        tail = (tail.get() + 1) % maxSize;
+        const int currentTail = tail.get();
+        value = buffer[currentTail];
+
+        tail = (currentTail + 1) % BufferSize;
         isFull = false;
 
         return true;
     }
 
-    // Check if the buffer is empty
+    // Überprüfe, ob der Buffer leer ist
     bool isEmpty() const {
         return (!isFull.get() && (head.get() == tail.get()));
     }
 
 private:
-    std::vector<T> buffer;              // Vector statt C-Array
-    const int maxSize;
-    juce::Atomic<int> head{ 0 };          // Atomare Kopfzeiger
-    juce::Atomic<int> tail{ 0 };          // Atomare Schwanzzeiger
-    juce::Atomic<bool> isFull{ false };   // Atomarer Status
-    mutable juce::CriticalSection mutex;
+    T buffer[BufferSize];                     // Statisches Array für den Puffer
+    juce::Atomic<int> head{ 0 };              // Atomarer Kopfzeiger
+    juce::Atomic<int> tail{ 0 };              // Atomarer Schwanzzeiger
+    juce::Atomic<bool> isFull{ false };       // Atomarer Status, ob der Puffer voll ist
 };

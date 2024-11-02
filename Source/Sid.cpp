@@ -15,9 +15,9 @@
 
 
 
-Sid::Sid() : ringBuffer0(MY_BUFFER_SIZE),
-ringBuffer1(MY_BUFFER_SIZE),
-ringBuffer2(MY_BUFFER_SIZE),
+Sid::Sid() : ringBuffer0(),
+ringBuffer1(),
+ringBuffer2(),
 playerThread(ringBuffer0,
 	ringBuffer1,
 	ringBuffer2,

@@ -12,9 +12,9 @@
 class SIDWriteThread : public juce::Thread {
 
 public:
-    SIDWriteThread( ThreadSafeRingBuffer<SIDWriteSet>& buffer0,
-                    ThreadSafeRingBuffer<SIDWriteSet>& buffer1,
-                    ThreadSafeRingBuffer<SIDWriteSet>& buffer2,
+    SIDWriteThread( ThreadSafeRingBuffer<SIDWriteSet, MY_BUFFER_SIZE>& buffer0,
+                    ThreadSafeRingBuffer<SIDWriteSet, MY_BUFFER_SIZE>& buffer1,
+                    ThreadSafeRingBuffer<SIDWriteSet, MY_BUFFER_SIZE>& buffer2,
                     juce::Atomic<int>& noofplayingdevices)
       : Thread("SIDWriteThread"),
         ringBuffer0(buffer0),
@@ -69,9 +69,9 @@ private:
     const int LOOP_TIME_OUT_MILLIS = 500;
     const int cycles = 8;
     SIDWriteSet value ;
-    ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer0;
-    ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer1;
-    ThreadSafeRingBuffer<SIDWriteSet>& ringBuffer2;
+    ThreadSafeRingBuffer<SIDWriteSet, MY_BUFFER_SIZE>& ringBuffer0;
+    ThreadSafeRingBuffer<SIDWriteSet, MY_BUFFER_SIZE>& ringBuffer1;
+    ThreadSafeRingBuffer<SIDWriteSet, MY_BUFFER_SIZE>& ringBuffer2;
     juce::Atomic<int>& NoOfPlayingDevices;
     int PlayingDevices = 0;
 };
