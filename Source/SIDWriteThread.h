@@ -32,7 +32,7 @@ public:
                 bool cie = false;
                 switch (i) {
                 case 0:  cie = ringBuffer0.remove(value);
-                    B1F = cie;
+                    B1F = cie; //store if buffer is empty or full
                     break;
                 case 1:  cie = ringBuffer1.remove(value);
                     B2F = cie;
@@ -49,10 +49,10 @@ public:
                     HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); // do nothing
                 }
             }
-            if (PlayingDevices > MyPlayingDevices) {
+            if (PlayingDevices > MyPlayingDevices) { 
                 MyPlayingDevices = PlayingDevices;
             }
-            if (PlayingDevices < MyPlayingDevices) {
+            if (PlayingDevices < MyPlayingDevices) { //We need to be sure the buffers are empty before decreasing the number of playing devices.
                 if ((PlayingDevices == 2) && !B3F) MyPlayingDevices = PlayingDevices;
                 if ((PlayingDevices == 1) && !B3F && !B2F) MyPlayingDevices = PlayingDevices;
                 if ((PlayingDevices == 0) && !B3F && !B2F && !B1F) MyPlayingDevices = PlayingDevices;
