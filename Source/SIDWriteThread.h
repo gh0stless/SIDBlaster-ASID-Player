@@ -23,7 +23,7 @@ public:
         NoOfPlayingDevices(noofplayingdevices) {}
 
     void run() override {
-        setPriority(juce::Thread::Priority::highest);
+        setPriority(juce::Thread::Priority::low);
         while (!threadShouldExit()) {
 
             PlayingDevices = NoOfPlayingDevices.get();
@@ -48,6 +48,7 @@ public:
                 else { // buffer empty
                     HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); // do nothing
                 }
+                
             }
             if (PlayingDevices > MyPlayingDevices) { 
                 MyPlayingDevices = PlayingDevices;

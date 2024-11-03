@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.6.0 beta
+// Version 0.6.2 beta
 
 #include "MainComponent.h"
 
@@ -30,7 +30,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.6.0 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.6.2 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -301,7 +301,7 @@ void MainComponent::timerCallback()
             Msg1Mem = false;
             if (!Msg2Mem && !Msg3Mem) updateNoOfPlayingDevices(0);
         }
-        if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
+        if (!Msg1Mem) led.setOn(false);
     }
     if (timeSinceLastMidi1.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
@@ -311,7 +311,7 @@ void MainComponent::timerCallback()
             if (Msg1Mem && !Msg3Mem) updateNoOfPlayingDevices(1);
             if (!Msg1Mem && !Msg3Mem) updateNoOfPlayingDevices(0);
         }
-        if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
+        if (!Msg1Mem) led.setOn(false);
     }
     if (timeSinceLastMidi2.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
@@ -322,7 +322,7 @@ void MainComponent::timerCallback()
             if (Msg1Mem && !Msg2Mem) updateNoOfPlayingDevices(1);
             if (!Msg1Mem && !Msg2Mem) updateNoOfPlayingDevices(0);
         }
-        if (!Msg1Mem && !Msg2Mem && !Msg3Mem) led.setOn(false);
+        if (!Msg1Mem) led.setOn(false);
     }
 }
 
