@@ -12,52 +12,43 @@
 template <typename T, int BufferSize>
 class ThreadSafeRingBuffer {
 public:
-    ThreadSafeRingBuffer() {}
+    ThreadSafeRingBuffer() : head(0), tail(0) {}
 
     // Füge ein neues Element zum Ringpuffer hinzu
     void add(const T& value) {
         juce::ScopedLock lock(mutex); // Sperrt den Zugriff während der add-Operation
-        const int currentHead = head.get();
-        buffer[currentHead] = value;
 
-        head = (currentHead + 1) % BufferSize;
+        buffer[head] = value;
+        head = (head + 1) % BufferSize;
 
-        // Wenn Kopf den Schwanz überschreibt, verschiebt sich der Schwanz
-        if (head.get() == tail.get()) {
-            tail = (tail.get() + 1) % BufferSize;
-            isFull = true;
-        }
-        else {
-            isFull = false;
+        // Wenn head den tail überschreibt, bewegt sich der tail-Zeiger weiter
+        if (head == tail) {
+            tail = (tail + 1) % BufferSize;
         }
     }
 
     // Entferne ein Element aus dem Ringpuffer
     bool remove(T& value) {
         juce::ScopedLock lock(mutex); // Sperrt den Zugriff während der remove-Operation
-        if (isEmpty()) {
+        if (head == tail) { // Direkte Prüfung, ob der Puffer leer ist
             return false;
         }
 
-        const int currentTail = tail.get();
-        value = buffer[currentTail];
-
-        tail = (currentTail + 1) % BufferSize;
-        isFull = false;
+        value = buffer[tail];
+        tail = (tail + 1) % BufferSize;
 
         return true;
     }
 
-    // Überprüfe, ob der Buffer leer ist
-    bool isEmpty() const {
+    // Überprüfe, ob der Puffer voll ist
+    bool isFull() const {
         juce::ScopedLock lock(mutex); // Sperrt den Zugriff während der Überprüfung
-        return (!isFull.get() && (head.get() == tail.get()));
+        return (head + 1) % BufferSize == tail;
     }
 
 private:
-    T buffer[BufferSize];                     // Statisches Array für den Puffer
-    juce::Atomic<int> head{ 0 };              // Atomarer Kopfzeiger
-    juce::Atomic<int> tail{ 0 };              // Atomarer Schwanzzeiger
-    juce::Atomic<bool> isFull{ false };       // Atomarer Status, ob der Puffer voll ist
-    mutable juce::CriticalSection mutex;      // Mutex für die Synchronisation
+    T buffer[BufferSize];                 // Statisches Array für den Puffer
+    int head;                             // Kopfzeiger
+    int tail;                             // Schwanzzeiger
+    mutable juce::CriticalSection mutex;  // Mutex für die Synchronisation
 };

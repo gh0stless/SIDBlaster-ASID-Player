@@ -3,7 +3,7 @@
 <JUCERPROJECT id="TIT5TR" name="SIDBlaster ASID Player" projectType="guiapp"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
               companyName="crazy-midi.de" companyWebsite="www.crazy-midi.de"
-              companyEmail="info@crazy-midi.de" headerPath="Source" version="0.6.2"
+              companyEmail="info@crazy-midi.de" headerPath="Source" version="0.6.4"
               bundleIdentifier="com.crazymidi.sidblasterasidplayer">
   <MAINGROUP id="iRcPnY" name="SIDBlaster ASID Player">
     <GROUP id="{B2ADDEAA-F2C0-E353-BBC5-F5219FB38A7C}" name="Source">
@@ -78,7 +78,8 @@
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="0" name="Release" targetName="SIDBlaster-ASID-Player"
                        useRuntimeLibDLL="1" libraryPath="..\..\libs\"/>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster-ASID-Player"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="SIDBlaster-ASID-Player"
+                       libraryPath="..\..\libs\"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../../../Frameworks/JUCE/modules"/>
