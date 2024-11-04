@@ -43,10 +43,18 @@ public:
                 }
 
                 if (cie) {
-                    HardSID_WriteWithTimeout(i, cycles, value.SIDRegister, value.SIDData);
+                    bool RS = false;
+                    while (!RS){
+                        RS = HardSID_WriteWithTimeout(i, cycles, value.SIDRegister, value.SIDData);
+                        if (!RS) juce::Thread::sleep(20);
+                    }
                 }
                 else { // buffer empty
-                    HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); // do nothing
+                    bool RS = false;
+                    while (!RS) {
+                        RS = HardSID_WriteWithTimeout(i, cycles, 0x1e, 0); // do nothing
+                        if (!RS) juce::Thread::sleep(20);
+                     }
                 }
                 
             }
