@@ -78,7 +78,8 @@ private:
     void timerCallback() override; 
     void saveComboBoxSelection(); 
     void loadComboBoxSelection(); 
-    void MainComponent::updateNoOfPlayingDevices(int newCount);
+    void updateNoOfPlayingDevices(int newCount);
+    void initSID(Uint8 device);
 
     bool Msg1Mem = false;
     bool Msg2Mem = false;

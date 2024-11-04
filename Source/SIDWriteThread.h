@@ -23,7 +23,7 @@ public:
         NoOfPlayingDevices(noofplayingdevices) {}
 
     void run() override {
-        setPriority(juce::Thread::Priority::low);
+        //setPriority(juce::Thread::Priority::low);
         while (!threadShouldExit()) {
 
             PlayingDevices = NoOfPlayingDevices.get();
@@ -95,5 +95,7 @@ private:
     juce::Atomic<int>& NoOfPlayingDevices;
     int PlayingDevices = 0;
     int MyPlayingDevices = 0;
-    bool B1F, B2F, B3F = false;
+    bool B1F = false;
+    bool B2F = false;
+    bool B3F = false;
 };
