@@ -84,6 +84,10 @@ private:
     bool Msg2Mem = false;
     bool Msg3Mem = false;
 
+    bool SID1isPlaying = false;
+    bool SID2isPlaying = false;
+    bool SID3isPlaying = false;
+
     juce::ComboBox midiDeviceSelector;
     std::unique_ptr<juce::MidiInput> midiInput;
     juce::TextEditor outputTextBox;      
