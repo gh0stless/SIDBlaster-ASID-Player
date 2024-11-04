@@ -60,17 +60,11 @@ public:
     MainComponent();
     ~MainComponent() override;
     //==============================================================================
-    //void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
-    //void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
-    //void releaseResources() override;
-    //==============================================================================
     void paint(juce::Graphics& g) override;
     void resized() override;
     //==============================================================================
     void setErrorState(bool hasError); 
-    //juce::CriticalSection noOfPlayingDevicesMutex;
-    //int No_Of_Playing_Devices = 0;
- 
+   
 private:
     void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
     void handleAsyncUpdate() override;
@@ -81,13 +75,13 @@ private:
     void updateNoOfPlayingDevices(int newCount);
     void initSID(Uint8 device);
 
-    bool Msg1Mem = false;
-    bool Msg2Mem = false;
-    bool Msg3Mem = false;
+    juce::Atomic<bool> Msg1Mem{ false };
+    juce::Atomic<bool> Msg2Mem{ false };
+    juce::Atomic<bool> Msg3Mem{ false };
 
-    bool SID1isPlaying = false;
-    bool SID2isPlaying = false;
-    bool SID3isPlaying = false;
+    juce::Atomic<bool> SID1isPlaying{ false };
+    juce::Atomic<bool> SID2isPlaying{ false };
+    juce::Atomic<bool> SID3isPlaying{ false };
 
     juce::ComboBox midiDeviceSelector;
     std::unique_ptr<juce::MidiInput> midiInput;
@@ -99,6 +93,8 @@ private:
     juce::Time lastMidiDataTime0;  // Speichert den Zeitpunkt des letzten MIDI-Daten-Eingangs
     juce::Time lastMidiDataTime1;
     juce::Time lastMidiDataTime2;
+    juce::CriticalSection timeMutex;
+            
     juce::CriticalSection midiMonitorLock;
     juce::Array<juce::MidiMessage> incomingMessages;
 

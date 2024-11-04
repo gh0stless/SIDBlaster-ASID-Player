@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.9.3 beta
+// Version 0.9.4 beta
 
 #include "MainComponent.h"
 
@@ -30,7 +30,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.3 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.4 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -147,9 +147,7 @@ void MainComponent::handleAsyncUpdate() {
         const juce::ScopedLock sl(midiMonitorLock);
         messages.swapWith(incomingMessages);
     }
-
-    lastMidiDataTime0 = juce::Time::getCurrentTime();
-    
+        
     // Durchlaufe alle empfangenen MIDI-Nachrichten
     for (const auto& message : messages){
 
@@ -168,66 +166,75 @@ void MainComponent::handleAsyncUpdate() {
                         uint8_t address = asid_sid_registers[mask * 7 + bit];
 
                         if ((data[1] == 78)) {
-                            lastMidiDataTime0 = juce::Time::getCurrentTime();
-                            if (!SID1isPlaying) {
-                                if (!Msg1Mem) {
+                            {   
+                                const juce::ScopedLock lock(timeMutex);
+                                lastMidiDataTime0 = juce::Time::getCurrentTime();
+                            }
+                            if (!SID1isPlaying.get()) {
+                                if (!Msg1Mem.get()) {
                                     outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
-                                    Msg1Mem = true;
+                                    Msg1Mem.set(true);
                                     led.setOn(true);
                                 }
-                                if (!SID1isPlaying && (!(SID2isPlaying || SID3isPlaying))) {
+                                if (!SID1isPlaying.get() && (!(SID2isPlaying.get() || SID3isPlaying.get()))) {
                                     updateNoOfPlayingDevices(1);
-                                    SID1isPlaying = true;
+                                    SID1isPlaying.set(true);
                                 }
                             }
                             if (sid->Number_Of_Devices>0) sid->push_event(0, address, register_value);
                                 
                         }
                         if (data[1] == 80) {
-                            lastMidiDataTime1 = juce::Time::getCurrentTime();
-                                if (sid->Number_Of_Devices > 1) {
-                                    if (!SID2isPlaying) {
-                                        if (!Msg2Mem) {
-                                            outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
-                                            Msg2Mem = true;
-                                            led.setOn(true);
-                                        }
-                                        if (!SID3isPlaying) {
-                                            updateNoOfPlayingDevices(2);
-                                            SID2isPlaying = true;
-                                        }
+                            {
+                                const juce::ScopedLock lock(timeMutex);
+                                lastMidiDataTime1 = juce::Time::getCurrentTime();
+                            }
+                            if (sid->Number_Of_Devices > 1) {
+                                if (!SID2isPlaying.get()) {
+                                    if (!Msg2Mem.get()) {
+                                        outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
+                                        Msg2Mem.set(true);
+                                        led.setOn(true);
                                     }
-                                    sid->push_event(1, address, register_value);
-                                }
-                                else {
-                                    if (!Msg2Mem) {
-                                        outputTextBox.insertTextAtCaret("You need more SIDBlasters for 2SID\n");
-                                        Msg2Mem = true;
+                                    if (!SID3isPlaying.get()) {
+                                        updateNoOfPlayingDevices(2);
+                                        SID2isPlaying.set(true);
                                     }
                                 }
+                                sid->push_event(1, address, register_value);
+                            }
+                            else {
+                                if (!Msg2Mem.get()) {
+                                    outputTextBox.insertTextAtCaret("You need more SIDBlasters for 2SID\n");
+                                    Msg2Mem.set(true);
+                                }
+                            }
                             
                         }
 
                         if (data[1] == 81) {
-                            lastMidiDataTime2 = juce::Time::getCurrentTime();
+                            {
+                                const juce::ScopedLock lock(timeMutex);
+                                lastMidiDataTime2 = juce::Time::getCurrentTime();
+                            }
                             if (sid->Number_Of_Devices > 2) {
-                                if (!SID3isPlaying) {
-                                    if (!Msg3Mem) {
+                                if (!SID3isPlaying.get()) {
+                                    if (!Msg3Mem.get()) {
                                         outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
-                                        Msg3Mem = true;
+                                        Msg3Mem.set(true);
                                         led.setOn(true);
                                     }
-                                    if (!SID3isPlaying) {
+                                    if (!SID3isPlaying.get()) {
                                         updateNoOfPlayingDevices(3);
-                                        SID3isPlaying = true;
+                                        SID3isPlaying.set(true);
                                     }
                                 }
                                 sid->push_event(2, address, register_value);
                             }
                             else {
-                                if (!Msg3Mem) {
+                                if (!Msg3Mem.get()) {
                                     outputTextBox.insertTextAtCaret("You need more SIDBlasters for 3SID\n");
-                                    Msg3Mem = true;
+                                    Msg3Mem.set(true);
                                 }
                             }
                         }
@@ -301,56 +308,63 @@ void MainComponent::timerCallback()
         auto HV = led.isOnState();
         HV = !HV;
         led.setOn(HV); // LED-Status umschalten
- 
+
     }
     // MIDI-Daten-Timeout-Logik
     auto currentTime = juce::Time::getCurrentTime();
-    auto timeSinceLastMidi0 = currentTime - lastMidiDataTime0;
-    auto timeSinceLastMidi1 = currentTime - lastMidiDataTime1;
-    auto timeSinceLastMidi2 = currentTime - lastMidiDataTime2;
+    
+    // Geschützten Zugriff auf die letzten MIDI-Zeiten
+    juce::RelativeTime timeSinceLastMidi0, timeSinceLastMidi1, timeSinceLastMidi2;
+    {
+        const juce::ScopedLock lock(timeMutex);
+        timeSinceLastMidi0 = currentTime - lastMidiDataTime0;
+        timeSinceLastMidi1 = currentTime - lastMidiDataTime1;
+        timeSinceLastMidi2 = currentTime - lastMidiDataTime2;
+    }
+
 
     if (timeSinceLastMidi0.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
-        if (Msg1Mem) {
+        if (Msg1Mem.get()) {
             outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
-            Msg1Mem = false;
-            if (!SID2isPlaying && !SID3isPlaying) updateNoOfPlayingDevices(0);
-            SID1isPlaying = false;
+            Msg1Mem.set(false);
+            if (!SID2isPlaying.get() && !SID3isPlaying.get()) updateNoOfPlayingDevices(0);
+            SID1isPlaying.set(false);
             initSID(0);
-            if ((!SID1isPlaying && !SID2isPlaying && !SID3isPlaying) && led.isOnState()) led.setOn(false);
+            if ((!SID1isPlaying.get() && !SID2isPlaying.get() && !SID3isPlaying.get()) && led.isOnState()) led.setOn(false);
         }
     }
     if (timeSinceLastMidi1.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
-        if (Msg2Mem && SID2isPlaying) {
+        if (Msg2Mem.get() && SID2isPlaying.get()) {
             outputTextBox.insertTextAtCaret("no more 2SID data, stop playing\n");
-            Msg2Mem = false;
-            if (SID1isPlaying && !SID3isPlaying) updateNoOfPlayingDevices(1);
-            if (!SID1isPlaying && !SID3isPlaying) updateNoOfPlayingDevices(0);
-            SID2isPlaying = false;
+            Msg2Mem.set(false);
+            if (SID1isPlaying.get() && !SID3isPlaying.get()) updateNoOfPlayingDevices(1);
+            if (!SID1isPlaying.get() && !SID3isPlaying.get()) updateNoOfPlayingDevices(0);
+            SID2isPlaying.set(false);
             initSID(1);
-            if ((!SID1isPlaying && !SID2isPlaying && !SID3isPlaying) && led.isOnState()) led.setOn(false);
+            if ((!SID1isPlaying.get() && !SID2isPlaying.get() && !SID3isPlaying.get()) && led.isOnState()) led.setOn(false);
         }
-        else if (Msg2Mem && !SID2isPlaying) {
+        else if (Msg2Mem.get() && !SID2isPlaying.get()) {
             outputTextBox.insertTextAtCaret("no more 2SID data\n");
-            Msg2Mem = false;
+            Msg2Mem.set(false);
         }
     }
     if (timeSinceLastMidi2.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
     {
-        if (Msg3Mem && SID3isPlaying) {
+        if (Msg3Mem.get() && SID3isPlaying.get()) {
             outputTextBox.insertTextAtCaret("no more 3SID data, stop playing\n");
-            Msg3Mem = false;
-            if (SID1isPlaying && SID2isPlaying) updateNoOfPlayingDevices(2);
-            if (SID1isPlaying && !SID2isPlaying) updateNoOfPlayingDevices(1);
-            if (!SID1isPlaying && !SID2isPlaying) updateNoOfPlayingDevices(0);
-            SID3isPlaying = false;
+            Msg3Mem.set(false);
+            if (SID1isPlaying.get() && SID2isPlaying.get()) updateNoOfPlayingDevices(2);
+            if (SID1isPlaying.get() && !SID2isPlaying.get()) updateNoOfPlayingDevices(1);
+            if (!SID1isPlaying.get() && !SID2isPlaying.get()) updateNoOfPlayingDevices(0);
+            SID3isPlaying.set(false);
             initSID(2);
-            if ((!SID1isPlaying && !SID2isPlaying && !SID3isPlaying) && led.isOnState()) led.setOn(false);
+            if ((!SID1isPlaying.get() && !SID2isPlaying.get() && !SID3isPlaying.get()) && led.isOnState()) led.setOn(false);
         }
-        else if (Msg3Mem && !SID3isPlaying) {
+        else if (Msg3Mem.get() && !SID3isPlaying.get()) {
             outputTextBox.insertTextAtCaret("no more 3SID data\n");
-            Msg3Mem = false;
+            Msg3Mem.set(false);
         }
     }
 }

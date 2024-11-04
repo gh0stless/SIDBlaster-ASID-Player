@@ -3,7 +3,7 @@
 <JUCERPROJECT id="TIT5TR" name="SIDBlaster ASID Player" projectType="guiapp"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
               companyName="crazy-midi.de" companyWebsite="www.crazy-midi.de"
-              companyEmail="info@crazy-midi.de" headerPath="Source" version="0.9.3"
+              companyEmail="info@crazy-midi.de" headerPath="Source" version="0.9.4"
               bundleIdentifier="com.crazymidi.sidblasterasidplayer">
   <MAINGROUP id="iRcPnY" name="SIDBlaster ASID Player">
     <GROUP id="{B2ADDEAA-F2C0-E353-BBC5-F5219FB38A7C}" name="Source">
