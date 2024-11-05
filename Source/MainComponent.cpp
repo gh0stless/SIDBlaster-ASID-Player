@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.9.6 beta
+// Version 0.9.7 beta
 //
 // ASID decoder routine was taken from the USBSID Piko project:
 // https://github.com/LouDnl/USBSID-Pico
@@ -36,7 +36,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.6 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.7 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -178,19 +178,26 @@ void MainComponent::handleAsyncUpdate() {
                                 const juce::ScopedLock lock(timeMutex);
                                 lastMidiDataTime0 = juce::Time::getCurrentTime();
                             }
-                            if (!SID1isPlaying.get()) {
-                                if (!Msg1Mem.get()) {
-                                    outputTextBox.insertTextAtCaret("ASID data recived, start playing SID1...\n");
-                                    Msg1Mem.set(true);
-                                    led.setOn(true);
+                            if (sid->Number_Of_Devices > 0) {
+                                if (!SID1isPlaying.get()) {
+                                    if (!Msg1Mem.get()) {
+                                        outputTextBox.insertTextAtCaret("ASID data recived, start playing SID1...\n");
+                                        Msg1Mem.set(true);
+                                        led.setOn(true);
+                                    }
+                                    if (!SID1isPlaying.get() && (!(SID2isPlaying.get() || SID3isPlaying.get()))) {
+                                        updateNoOfPlayingDevices(1);
+                                        SID1isPlaying.set(true);
+                                    }
                                 }
-                                if (!SID1isPlaying.get() && (!(SID2isPlaying.get() || SID3isPlaying.get()))) {
-                                    updateNoOfPlayingDevices(1);
-                                    SID1isPlaying.set(true);
+                                if (sid->Number_Of_Devices > 0) sid->push_event(0, address, register_value);
+                            }
+                            else {
+                                if (!Msg1Mem.get()) {
+                                    outputTextBox.insertTextAtCaret("You need more SIDBlasters for ASID\n");
+                                    Msg1Mem.set(true);
                                 }
                             }
-                            if (sid->Number_Of_Devices>0) sid->push_event(0, address, register_value);
-                                
                         }
                         if (data[1] == 80) {
                             {
@@ -339,6 +346,10 @@ void MainComponent::timerCallback()
             if (!SID2isPlaying.get() && !SID3isPlaying.get()) updateNoOfPlayingDevices(0);
             SID1isPlaying.set(false);
             if ((!SID1isPlaying.get() && !SID2isPlaying.get() && !SID3isPlaying.get()) && led.isOnState()) led.setOn(false);
+        }
+        else if (Msg1Mem.get() && !SID1isPlaying.get()) {
+            outputTextBox.insertTextAtCaret("no more ASID data\n");
+            Msg1Mem.set(false);
         }
     }
     if (timeSinceLastMidi1.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne 2SID-Daten vergangen sind
