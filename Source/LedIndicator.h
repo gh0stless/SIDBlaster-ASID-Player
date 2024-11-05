@@ -24,6 +24,7 @@ public:
     // Setzt den Zustand der LED und aktualisiert die Anzeige
     void setOn(bool state)
     {
+        std::scoped_lock lock(stateMutex);
         isOn = state;
         repaint();
     }
@@ -31,7 +32,7 @@ public:
     // Setzt den Blinkzustand der LED
     void setBlinkingRed(bool state)
     {
-        
+        std::scoped_lock lock(stateMutex);
         isBlinking = state;
         blinkColour = juce::Colours::red;
         if (state)
@@ -44,6 +45,8 @@ public:
     void paint(juce::Graphics& g) override
     {
         auto bounds = getLocalBounds().toFloat();
+
+        std::scoped_lock lock(stateMutex);
         if (isOn && ledOnImage.isValid()) {
             g.drawImage(ledOnImage, bounds);  // Zeichnet das „LED an“-Bild
         }
@@ -58,11 +61,19 @@ public:
         setOn(!isOn); // Zustand der LED umschalten
     }
 
-    // Getter für den Blinkzustand
-    bool isBlinkingState() const { return isBlinking; }
+    // Getter für den Blinkzustand (threadsicher)
+    bool isBlinkingState() const
+    {
+        std::scoped_lock lock(stateMutex);
+        return isBlinking;
+    }
 
-    // Getter für den Zustand der LED
-    bool isOnState() const { return isOn; }
+    // Getter für den Zustand der LED (threadsicher)
+    bool isOnState() const
+    {
+        std::scoped_lock lock(stateMutex);
+        return isOn;
+    }
 
 private:
 
@@ -71,5 +82,6 @@ private:
     bool isOn = false;         // Status der LED
     bool isBlinking = false;   // Blinkzustand der LED
     juce::Colour blinkColour;  // Farbe der blinkenden LED (rot oder grün)
+    mutable std::mutex stateMutex; // Mutex für die threadsichere Verarbeitung
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LedIndicator)
 };
