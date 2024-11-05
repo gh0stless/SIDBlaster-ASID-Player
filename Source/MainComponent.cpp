@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.9.7 beta
+// Version 0.9.8 beta
 //
 // ASID decoder routine was taken from the USBSID Piko project:
 // https://github.com/LouDnl/USBSID-Pico
@@ -36,7 +36,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.7 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.8 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -82,10 +82,10 @@ MainComponent::MainComponent()
             else if (SIDTYPE == 1)  outputTextBox.insertTextAtCaret("6581 SID detected\n");
             else if (SIDTYPE == 2)  outputTextBox.insertTextAtCaret("8580 SID detected\n");
         }
-        startTimer(500);
-        juce::Thread::sleep(100);
-        updateNoOfPlayingDevices(0);
     }
+    startTimer(500);
+    juce::Thread::sleep(100);
+    updateNoOfPlayingDevices(0);
  }
 
 MainComponent::~MainComponent(){
@@ -318,13 +318,6 @@ void MainComponent::setErrorState(bool hasError)
 
 void MainComponent::timerCallback()
 {
-    if (led.isBlinkingState())
-    {
-        auto HV = led.isOnState();
-        HV = !HV;
-        led.setOn(HV); // LED-Status umschalten
-
-    }
     // MIDI-Daten-Timeout-Logik
     auto currentTime = juce::Time::getCurrentTime();
     
@@ -340,7 +333,7 @@ void MainComponent::timerCallback()
 
     if (timeSinceLastMidi0.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne 1SID-Daten vergangen sind
     {
-        if (Msg1Mem.get()) {
+        if (Msg1Mem.get() && SID1isPlaying.get()) {
             outputTextBox.insertTextAtCaret("no more ASID data, stop playing SID1\n");
             Msg1Mem.set(false);
             if (!SID2isPlaying.get() && !SID3isPlaying.get()) updateNoOfPlayingDevices(0);
