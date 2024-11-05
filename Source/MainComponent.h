@@ -73,8 +73,7 @@ private:
     void saveComboBoxSelection(); 
     void loadComboBoxSelection(); 
     void updateNoOfPlayingDevices(int newCount);
-    void initSID(Uint8 device);
-
+    
     juce::Atomic<bool> Msg1Mem{ false };
     juce::Atomic<bool> Msg2Mem{ false };
     juce::Atomic<bool> Msg3Mem{ false };
@@ -87,15 +86,19 @@ private:
     std::unique_ptr<juce::MidiInput> midiInput;
     juce::TextEditor outputTextBox;      
     juce::ApplicationProperties appProperties;
+    
     Sid* sid;
     LedIndicator led; 
+    
     juce::Image backgroundImage;
-    juce::Time lastMidiDataTime0;  // Speichert den Zeitpunkt des letzten MIDI-Daten-Eingangs
+    
+    juce::Time lastMidiDataTime0;
     juce::Time lastMidiDataTime1;
     juce::Time lastMidiDataTime2;
+    
     juce::CriticalSection timeMutex;
-            
     juce::CriticalSection midiMonitorLock;
+    
     juce::Array<juce::MidiMessage> incomingMessages;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)

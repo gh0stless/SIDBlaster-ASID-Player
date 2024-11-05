@@ -1,7 +1,13 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.9.4 beta
+// Version 0.9.5 beta
+//
+// ASID decoder routine was taken from the USBSID Piko project:
+// https://github.com/LouDnl/USBSID-Pico
+// 
+// Hardsid library by Stein Pedersen & Ken Händel
+// Thanks to Wilfred Bos for his tips and tricks
 
 #include "MainComponent.h"
 
@@ -30,7 +36,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.4 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.5 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -132,7 +138,7 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
 {
     if (message.isSysEx())
     {
-        const juce::ScopedLock sl(midiMonitorLock); // Thread-sicherer Zugriff
+        const juce::ScopedLock sl(midiMonitorLock);
         incomingMessages.add(message);
         triggerAsyncUpdate(); // Asynchrones Update starten
     }
@@ -172,7 +178,7 @@ void MainComponent::handleAsyncUpdate() {
                             }
                             if (!SID1isPlaying.get()) {
                                 if (!Msg1Mem.get()) {
-                                    outputTextBox.insertTextAtCaret("ASID data recived, start playing...\n");
+                                    outputTextBox.insertTextAtCaret("ASID data recived, start playing SID1...\n");
                                     Msg1Mem.set(true);
                                     led.setOn(true);
                                 }
@@ -192,7 +198,7 @@ void MainComponent::handleAsyncUpdate() {
                             if (sid->Number_Of_Devices > 1) {
                                 if (!SID2isPlaying.get()) {
                                     if (!Msg2Mem.get()) {
-                                        outputTextBox.insertTextAtCaret("2SID data recived, start playing...\n");
+                                        outputTextBox.insertTextAtCaret("2SID data recived, start playing SID2...\n");
                                         Msg2Mem.set(true);
                                         led.setOn(true);
                                     }
@@ -220,7 +226,7 @@ void MainComponent::handleAsyncUpdate() {
                             if (sid->Number_Of_Devices > 2) {
                                 if (!SID3isPlaying.get()) {
                                     if (!Msg3Mem.get()) {
-                                        outputTextBox.insertTextAtCaret("3SID data recived, start playing...\n");
+                                        outputTextBox.insertTextAtCaret("3SID data recived, start playing SID3...\n");
                                         Msg3Mem.set(true);
                                         led.setOn(true);
                                     }
@@ -323,26 +329,24 @@ void MainComponent::timerCallback()
     }
 
 
-    if (timeSinceLastMidi0.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
+    if (timeSinceLastMidi0.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne 1SID-Daten vergangen sind
     {
         if (Msg1Mem.get()) {
-            outputTextBox.insertTextAtCaret("no more ASID data, stop playing\n");
+            outputTextBox.insertTextAtCaret("no more ASID data, stop playing SID1\n");
             Msg1Mem.set(false);
             if (!SID2isPlaying.get() && !SID3isPlaying.get()) updateNoOfPlayingDevices(0);
             SID1isPlaying.set(false);
-            initSID(0);
             if ((!SID1isPlaying.get() && !SID2isPlaying.get() && !SID3isPlaying.get()) && led.isOnState()) led.setOn(false);
         }
     }
-    if (timeSinceLastMidi1.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
+    if (timeSinceLastMidi1.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne 2SID-Daten vergangen sind
     {
         if (Msg2Mem.get() && SID2isPlaying.get()) {
-            outputTextBox.insertTextAtCaret("no more 2SID data, stop playing\n");
+            outputTextBox.insertTextAtCaret("no more 2SID data, stop playing SID2\n");
             Msg2Mem.set(false);
             if (SID1isPlaying.get() && !SID3isPlaying.get()) updateNoOfPlayingDevices(1);
             if (!SID1isPlaying.get() && !SID3isPlaying.get()) updateNoOfPlayingDevices(0);
             SID2isPlaying.set(false);
-            initSID(1);
             if ((!SID1isPlaying.get() && !SID2isPlaying.get() && !SID3isPlaying.get()) && led.isOnState()) led.setOn(false);
         }
         else if (Msg2Mem.get() && !SID2isPlaying.get()) {
@@ -350,16 +354,15 @@ void MainComponent::timerCallback()
             Msg2Mem.set(false);
         }
     }
-    if (timeSinceLastMidi2.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne MIDI-Daten vergangen sind
+    if (timeSinceLastMidi2.inMilliseconds() >= 3000)  // Überprüfe, ob 3 Sekunden ohne 3SID-Daten vergangen sind
     {
         if (Msg3Mem.get() && SID3isPlaying.get()) {
-            outputTextBox.insertTextAtCaret("no more 3SID data, stop playing\n");
+            outputTextBox.insertTextAtCaret("no more 3SID data, stop playing SID3\n");
             Msg3Mem.set(false);
             if (SID1isPlaying.get() && SID2isPlaying.get()) updateNoOfPlayingDevices(2);
             if (SID1isPlaying.get() && !SID2isPlaying.get()) updateNoOfPlayingDevices(1);
             if (!SID1isPlaying.get() && !SID2isPlaying.get()) updateNoOfPlayingDevices(0);
             SID3isPlaying.set(false);
-            initSID(2);
             if ((!SID1isPlaying.get() && !SID2isPlaying.get() && !SID3isPlaying.get()) && led.isOnState()) led.setOn(false);
         }
         else if (Msg3Mem.get() && !SID3isPlaying.get()) {
@@ -401,12 +404,6 @@ void MainComponent::loadComboBoxSelection(){
 
 void MainComponent::updateNoOfPlayingDevices(int newCount)
 {
-    //juce::ScopedLock lock(noOfPlayingDevicesMutex); // Sperrt den CriticalSection
-    No_Of_Playing_Devices.set(newCount);                  // Schreibzugriff
+    No_Of_Playing_Devices.set(newCount);
 }
 
-void MainComponent::initSID(Uint8 device) {
-    for (auto r = 0; r < NUMSIDREGS; r++) {
-        sid->push_event(device, r, 0x00);
-    }
-}
