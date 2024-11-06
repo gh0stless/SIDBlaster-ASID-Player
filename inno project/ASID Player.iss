@@ -1,11 +1,11 @@
 [Setup]
 AppName=SB-ASID-Player
-AppVersion=0.9.8
+AppVersion=0.9.9
 DefaultDirName={pf}\SB-ASID-Player
 DefaultGroupName=SB-ASID-Player
 LicenseFile=license.txt
 OutputDir=.\Output
-OutputBaseFilename=SIDBlaster-ASID-Player-Win-x64-V0.9.8b-Installer
+OutputBaseFilename=SIDBlaster-ASID-Player-Win-x64-V0.9.9b-Installer
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64

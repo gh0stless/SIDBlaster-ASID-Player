@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.9.8.1 beta
+// Version 0.9.9 beta
 //
 // ASID decoder routine was taken from the USBSID Piko project:
 // https://github.com/LouDnl/USBSID-Pico
@@ -36,7 +36,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.8.1 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.9 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -226,7 +226,6 @@ void MainComponent::handleAsyncUpdate() {
                             }
                             
                         }
-
                         if (data[1] == 81) {
                             {
                                 const juce::ScopedLock lock(timeMutex);
@@ -273,7 +272,6 @@ void MainComponent::handleAsyncUpdate() {
             outputTextBox.insertTextAtCaret("\n");
         }
     }
-    incomingMessages.clear(); // Nachrichtencache leeren
 }
 //==============================================================================
 void MainComponent::comboBoxChanged(juce::ComboBox* comboBox)
