@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 0.9.9 beta
+// Version 0.9.9.1 beta
 //
 // ASID decoder routine was taken from the USBSID Piko project:
 // https://github.com/LouDnl/USBSID-Pico
@@ -36,7 +36,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.9 (beta)\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 0.9.9.1 (beta)\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -60,8 +60,12 @@ MainComponent::MainComponent()
     }
             
     sid = new Sid();
+    if (sid->error_state == 1) {
+        outputTextBox.insertTextAtCaret("Can't load hardsid library!\n");
+        goto exit_label;
+    }
     outputTextBox.insertTextAtCaret("DLL Version: " +  juce::String(sid->GetDLLVersion()) + "\n");
-    if (sid->error_state) {
+    if (sid->error_state == 2) {
         setErrorState(true);
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
     }
@@ -86,6 +90,7 @@ MainComponent::MainComponent()
     startTimer(500);
     juce::Thread::sleep(100);
     updateNoOfPlayingDevices(0);
+exit_label:;
  }
 
 MainComponent::~MainComponent(){
