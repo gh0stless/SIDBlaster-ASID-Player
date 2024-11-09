@@ -1,4 +1,4 @@
 # SIDBlaster-ASID-Protocol-Player
 
-![ASIDPlayer](.\ASIDPlayer.jpg)
+![ASIDPlayer](./ASIDPlayer.jpg)
 
