@@ -7,6 +7,8 @@
               bundleIdentifier="com.crazymidi.sidblasterasidplayer">
   <MAINGROUP id="iRcPnY" name="SIDBlaster ASID Player">
     <GROUP id="{B2ADDEAA-F2C0-E353-BBC5-F5219FB38A7C}" name="Source">
+      <FILE id="RVVPgU" name="sid_definitions.h" compile="0" resource="0"
+            file="Source/sid_definitions.h"/>
       <FILE id="QBiLJJ" name="Mutex.h" compile="0" resource="0" file="Source/Mutex.h"/>
       <FILE id="Mf2qhl" name="Mutex.cpp" compile="1" resource="0" file="Source/Mutex.cpp"/>
       <FILE id="jvUoKo" name="red-led-off.png" compile="0" resource="1" file="Source/red-led-off.png"/>
@@ -33,8 +35,6 @@
     </GROUP>
     <FILE id="TNa5Zg" name="asid_protocol.txt" compile="0" resource="1"
           file="docs/asid_protocol.txt"/>
-    <FILE id="jdL8BC" name="hardsid.dll how to and hints.txt" compile="0"
-          resource="1" file="docs/hardsid.dll how to and hints.txt"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
