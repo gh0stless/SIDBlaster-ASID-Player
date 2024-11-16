@@ -201,9 +201,9 @@
 									<key>GID</key>
 									<integer>80</integer>
 									<key>PATH</key>
-									<string>SIDBlaster-ASID-Player.app</string>
+									<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app</string>
 									<key>PATH_TYPE</key>
-									<integer>1</integer>
+									<integer>0</integer>
 									<key>PERMISSIONS</key>
 									<integer>493</integer>
 									<key>TYPE</key>
@@ -885,6 +885,22 @@
 													<key>GID</key>
 													<integer>0</integer>
 													<key>PATH</key>
+													<string>/usr/local/lib/libftd2xx.1.4.30.dylib</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>493</integer>
+													<key>TYPE</key>
+													<integer>3</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+												<dict>
+													<key>CHILDREN</key>
+													<array/>
+													<key>GID</key>
+													<integer>0</integer>
+													<key>PATH</key>
 													<string>/usr/local/lib/libhardsid.dylib</string>
 													<key>PATH_TYPE</key>
 													<integer>0</integer>
@@ -1000,8 +1016,10 @@
 			<dict>
 				<key>POSTINSTALL_PATH</key>
 				<dict>
+					<key>PATH</key>
+					<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/postinst</string>
 					<key>PATH_TYPE</key>
-					<integer>1</integer>
+					<integer>0</integer>
 				</dict>
 				<key>PREINSTALL_PATH</key>
 				<dict>

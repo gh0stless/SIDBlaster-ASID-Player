@@ -1,7 +1,5 @@
 Welcome to the SIDBlaster ASID protocol player for MacOS.
 
-First you have to install the FTDI D2XX drivers.
-
 You need to set up a MIDI loop port in MacOS.
 
 Plug in your SIDBlaster and then start ASID Player and select the MIDI loop port.
