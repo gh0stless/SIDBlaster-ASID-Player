@@ -13,12 +13,14 @@ SetupIconFile=icon.ico
 
 [Files]
 Source: "SIDBlaster-ASID-Player.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "SIDBlastertool.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "hardsid.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "readme.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
 [Icons]
 Name: "{group}\SB-ASID-Player"; Filename: "{app}\SIDBlaster-ASID-Player.exe"
+Name: "{group}\SIDBlastertool"; Filename: "{app}\SIDBlastertool.exe"
 Name: "{group}\readme"; Filename: "{app}\readme.txt"
 Name: "{userdesktop}\SB-ASID-Player"; Filename: "{app}\SIDBlaster-ASID-Player.exe"; Tasks: desktopicon
 
