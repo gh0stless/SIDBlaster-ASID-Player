@@ -21,187 +21,24 @@
 							<key>CHILDREN</key>
 							<array>
 								<dict>
+									<key>BUNDLE_CAN_DOWNGRADE</key>
+									<false/>
+									<key>BUNDLE_POSTINSTALL_PATH</key>
+									<dict>
+										<key>PATH_TYPE</key>
+										<integer>0</integer>
+									</dict>
+									<key>BUNDLE_PREINSTALL_PATH</key>
+									<dict>
+										<key>PATH_TYPE</key>
+										<integer>0</integer>
+									</dict>
 									<key>CHILDREN</key>
-									<array>
-										<dict>
-											<key>CHILDREN</key>
-											<array>
-												<dict>
-													<key>CHILDREN</key>
-													<array>
-														<dict>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>80</integer>
-															<key>PATH</key>
-															<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/_CodeSignature/CodeResources</string>
-															<key>PATH_TYPE</key>
-															<integer>0</integer>
-															<key>PERMISSIONS</key>
-															<integer>420</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-													</array>
-													<key>EXPANDED</key>
-													<true/>
-													<key>GID</key>
-													<integer>80</integer>
-													<key>PATH</key>
-													<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/_CodeSignature</string>
-													<key>PATH_TYPE</key>
-													<integer>0</integer>
-													<key>PERMISSIONS</key>
-													<integer>493</integer>
-													<key>TYPE</key>
-													<integer>3</integer>
-													<key>UID</key>
-													<integer>0</integer>
-												</dict>
-												<dict>
-													<key>CHILDREN</key>
-													<array/>
-													<key>GID</key>
-													<integer>80</integer>
-													<key>PATH</key>
-													<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/Info.plist</string>
-													<key>PATH_TYPE</key>
-													<integer>0</integer>
-													<key>PERMISSIONS</key>
-													<integer>420</integer>
-													<key>TYPE</key>
-													<integer>3</integer>
-													<key>UID</key>
-													<integer>0</integer>
-												</dict>
-												<dict>
-													<key>CHILDREN</key>
-													<array>
-														<dict>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>80</integer>
-															<key>PATH</key>
-															<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/MacOS/SIDBlaster-ASID-Player</string>
-															<key>PATH_TYPE</key>
-															<integer>0</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-													</array>
-													<key>EXPANDED</key>
-													<true/>
-													<key>GID</key>
-													<integer>80</integer>
-													<key>PATH</key>
-													<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/MacOS</string>
-													<key>PATH_TYPE</key>
-													<integer>0</integer>
-													<key>PERMISSIONS</key>
-													<integer>493</integer>
-													<key>TYPE</key>
-													<integer>3</integer>
-													<key>UID</key>
-													<integer>0</integer>
-												</dict>
-												<dict>
-													<key>CHILDREN</key>
-													<array/>
-													<key>GID</key>
-													<integer>80</integer>
-													<key>PATH</key>
-													<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/PkgInfo</string>
-													<key>PATH_TYPE</key>
-													<integer>0</integer>
-													<key>PERMISSIONS</key>
-													<integer>420</integer>
-													<key>TYPE</key>
-													<integer>3</integer>
-													<key>UID</key>
-													<integer>0</integer>
-												</dict>
-												<dict>
-													<key>CHILDREN</key>
-													<array>
-														<dict>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>80</integer>
-															<key>PATH</key>
-															<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/Resources/Icon.icns</string>
-															<key>PATH_TYPE</key>
-															<integer>0</integer>
-															<key>PERMISSIONS</key>
-															<integer>420</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>80</integer>
-															<key>PATH</key>
-															<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/Resources/RecentFilesMenuTemplate.nib</string>
-															<key>PATH_TYPE</key>
-															<integer>0</integer>
-															<key>PERMISSIONS</key>
-															<integer>420</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-													</array>
-													<key>EXPANDED</key>
-													<true/>
-													<key>GID</key>
-													<integer>80</integer>
-													<key>PATH</key>
-													<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents/Resources</string>
-													<key>PATH_TYPE</key>
-													<integer>0</integer>
-													<key>PERMISSIONS</key>
-													<integer>493</integer>
-													<key>TYPE</key>
-													<integer>3</integer>
-													<key>UID</key>
-													<integer>0</integer>
-												</dict>
-											</array>
-											<key>EXPANDED</key>
-											<true/>
-											<key>GID</key>
-											<integer>80</integer>
-											<key>PATH</key>
-											<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app/Contents</string>
-											<key>PATH_TYPE</key>
-											<integer>0</integer>
-											<key>PERMISSIONS</key>
-											<integer>493</integer>
-											<key>TYPE</key>
-											<integer>3</integer>
-											<key>UID</key>
-											<integer>0</integer>
-										</dict>
-									</array>
-									<key>EXPANDED</key>
-									<true/>
+									<array/>
 									<key>GID</key>
 									<integer>80</integer>
 									<key>PATH</key>
-									<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/SIDBlaster-ASID-Player.app</string>
+									<string>/Applications/SIDBlaster-ASID-Player.app</string>
 									<key>PATH_TYPE</key>
 									<integer>0</integer>
 									<key>PERMISSIONS</key>
@@ -862,7 +699,24 @@
 									<array>
 										<dict>
 											<key>CHILDREN</key>
-											<array/>
+											<array>
+												<dict>
+													<key>CHILDREN</key>
+													<array/>
+													<key>GID</key>
+													<integer>0</integer>
+													<key>PATH</key>
+													<string>/usr/local/bin/SIDBlasterTool</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>493</integer>
+													<key>TYPE</key>
+													<integer>3</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+											</array>
 											<key>GID</key>
 											<integer>0</integer>
 											<key>PATH</key>
@@ -1017,7 +871,7 @@
 				<key>POSTINSTALL_PATH</key>
 				<dict>
 					<key>PATH</key>
-					<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/postinst</string>
+					<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/installer/packages-project/SIDBlaster-ASID-Player/postinst</string>
 					<key>PATH_TYPE</key>
 					<integer>0</integer>
 				</dict>
@@ -1195,7 +1049,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/license.txt</string>
+							<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/installer/packages-project/SIDBlaster-ASID-Player/license.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>0</integer>
 						</dict>
@@ -1214,7 +1068,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/packages project/SIDBlaster-ASID-Player/Readme.txt</string>
+							<string>/Users/andreas/Desktop/GitHub/SIDBlaster-ASID-Player/installer/packages-project/SIDBlaster-ASID-Player/Readme.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>0</integer>
 						</dict>
