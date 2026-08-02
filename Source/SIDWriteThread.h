@@ -22,12 +22,25 @@ public:
         ringBuffer2(buffer2),
         NoOfPlayingDevices(noofplayingdevices) {}
 
+    // EXPERIMENT, REVERTED: tried dropping the "do nothing" keep-alive
+    // write (0x1e) for the "buffer empty but a device is playing" case,
+    // on the theory that it only existed to compensate for the classic
+    // driver's own busy-spin bug (now fixed - see the driver fork's
+    // README). Wrong theory: `cycles` below is a FIXED constant (8), not
+    // a computed real-time delta - this design keeps the emulated SID
+    // clock in sync with wall-clock time purely by calling the driver as
+    // often as possible (at ~985kHz PAL, keeping pace needs roughly
+    // 985248/8 ~= 123k calls/sec). The tight loop - keep-alive writes
+    // included - IS the timing mechanism, not an incidental side effect.
+    // Confirmed empirically: even juce::Thread::yield() (no minimum
+    // delay) in the empty-buffer case measurably slowed playback.
+    // Reverted to the original unconditional tight loop.
     void run() override {
         //setPriority(juce::Thread::Priority::low);
         while (!threadShouldExit()) {
 
             PlayingDevices = NoOfPlayingDevices.get();
-            
+
             for (int i = 0; i < MyPlayingDevices; i++) {
                 bool cie = false;
                 switch (i) {
@@ -56,9 +69,9 @@ public:
                         if (!RS) juce::Thread::sleep(20);
                      }
                 }
-                
+
             }
-            if (PlayingDevices > MyPlayingDevices) { 
+            if (PlayingDevices > MyPlayingDevices) {
                 MyPlayingDevices = PlayingDevices;
             }
             if (PlayingDevices < MyPlayingDevices) { //We need to be sure the buffers are empty before decreasing the number of playing devices.

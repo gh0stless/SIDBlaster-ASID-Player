@@ -43,13 +43,13 @@ playerThread(ringBuffer0,
 
 		// Check to see if the library was loaded successfully 
 		if (hardsiddll == true) {
-          
+
             My_HardSID_Version = (lpHardSID_Version)hardsidlibrary.getFunction("HardSID_Version");
             My_HardSID_Devices = (lpHardSID_Devices)hardsidlibrary.getFunction("HardSID_Devices");
             My_HardSID_Flush = (lpHardSID_Flush)hardsidlibrary.getFunction("HardSID_Flush");
             My_HardSID_SoftFlush = (lpHardSID_SoftFlush)hardsidlibrary.getFunction("HardSID_SoftFlush");
             My_HardSID_Lock = (lpHardSID_Lock)hardsidlibrary.getFunction("HardSID_Lock");
-            My_HardSID_Reset = (lpHardSID_Reset)hardsidlibrary.getFunction("HardSID_Reset");          
+            My_HardSID_Reset = (lpHardSID_Reset)hardsidlibrary.getFunction("HardSID_Reset");
             My_HardSID_Try_Write = (lpHardSID_Try_Write)hardsidlibrary.getFunction("HardSID_Try_Write");
             My_HardSID_Uninitialize   = (lpHardSID_Uninitialize)hardsidlibrary.getFunction("HardSID_Uninitialize");
 			My_HardSID_GetSIDType = (lpHardSID_GetSIDType)hardsidlibrary.getFunction("HardSID_GetSIDType");

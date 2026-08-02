@@ -1,7 +1,7 @@
 //==============================================================================
 // SIDBlaster ASID Protocol Player
 // by Andreas Schumm (gh0stless) 2024
-// Version 1.0
+// Version 1.1
 //
 // ASID decoder routine was taken from the USBSID Piko project:
 // https://github.com/LouDnl/USBSID-Pico
@@ -10,6 +10,24 @@
 // Thanks to Wilfred Bos for his tips and tricks
 
 #include "MainComponent.h"
+
+namespace {
+// Shown for fatal init errors (no hardsid.dll, no SIDBlaster found) -
+// previously only the LED blinked red and the app kept running in a
+// half-initialised state. Async so it doesn't block the constructor;
+// quits once the user acknowledges it.
+void ShowFatalErrorAndQuit(const juce::String& message) {
+    juce::NativeMessageBox::showAsync(
+        juce::MessageBoxOptions()
+            .withIconType(juce::MessageBoxIconType::WarningIcon)
+            .withTitle("SIDBlaster ASID Player")
+            .withMessage(message)
+            .withButton("OK"),
+        [](int) {
+            juce::JUCEApplication::getInstance()->systemRequestedQuit();
+        });
+}
+}
 
 MainComponent::MainComponent()
 {
@@ -36,7 +54,7 @@ MainComponent::MainComponent()
     outputTextBox.applyColourToAllText(juce::Colours::lightgreen);
     outputTextBox.setScrollbarsShown(true);
 
-    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 1.0\n");
+    outputTextBox.insertTextAtCaret("SIDBlaster ASID Protocol Player 1.1\n");
     outputTextBox.insertTextAtCaret("by gh0stless 2024\n");
 
     // Füge alle verfügbaren MIDI-Geräte zur ComboBox hinzu
@@ -62,12 +80,15 @@ MainComponent::MainComponent()
     sid = new Sid();
     if (sid->error_state == 1) {
         outputTextBox.insertTextAtCaret("Can't load hardsid library!\n");
+        ShowFatalErrorAndQuit("hardsid.dll konnte nicht geladen werden.");
         goto exit_label;
     }
     outputTextBox.insertTextAtCaret("DLL Version: " +  juce::String(sid->GetDLLVersion()) + "\n");
     if (sid->error_state == 2) {
         setErrorState(true);
         outputTextBox.insertTextAtCaret("No Sidblaster detected!\n");
+        ShowFatalErrorAndQuit("Kein SIDBlaster gefunden.");
+        goto exit_label;
     }
     else {
         
@@ -165,12 +186,25 @@ void MainComponent::handleAsyncUpdate() {
         const Uint8* data = message.getSysExData();
         int dataSize = message.getSysExDataSize();
 
+        // Bail out before touching data[0]/data[1] below - a SysEx message
+        // shorter than 2 bytes (from any MIDI source, not just ASID gear)
+        // would otherwise read out of bounds.
+        if (dataSize < 2) continue;
+
         //decodiere ASID MIDI Daten
-        if ((dataSize > 3) && ((data[0] == 45) && (data[1] == 78 || data[1] == 80 || data[1] == 81))) {
+        // "send command to SID" needs at least 10 bytes (2 header + 4 mask +
+        // 4 msb bytes per asid_protocol.txt); the old ">3" check let
+        // truncated messages through and read past the buffer below.
+        if ((dataSize >= 10) && (data[0] == 45) && (data[1] == 78 || data[1] == 80 || data[1] == 81)) {
             unsigned int reg = 0;
-            for (uint8_t mask = 0; mask < 4; mask++) {  /* no more then 4 masks */
+            bool truncated = false;
+            for (uint8_t mask = 0; mask < 4 && !truncated; mask++) {  /* no more then 4 masks */
                 for (uint8_t bit = 0; bit < 7; bit++) {  /* each packet has 7 bits ~ stoopid midi */
                     if (data[mask + 2] & (1 << bit)) {  /* 3 byte message, skip 3 each round and add the bit */
+                        // <data> bytes are variable-length (one per set mask
+                        // bit), so a malformed message can still claim more
+                        // set bits than it actually carries data for.
+                        if (reg + 10 >= (unsigned int)dataSize) { truncated = true; break; }
                         uint8_t register_value = data[reg + 10];  /* get the value to write from the buffer */
                         if (data[mask + 6] & (1 << bit)) {  /* if anything higher then 0 */
                             register_value |= 0x80;  /* the register_value needs its 8th MSB bit */
