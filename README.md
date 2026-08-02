@@ -52,8 +52,7 @@ Current release: **1.1**
 
 ## hardsid.dll
 
-- https://github.com/Galfodo/SIDBlasterUSB_HardSID-emulation-driver
-- https://haendel.ddns.net/~ken/sidblaster.html
+https://github.com/gh0stless/SIDBlasterUSB_HardSID-emulation-driver
 
 ## License
 
