@@ -24,14 +24,12 @@ playerThread(ringBuffer0,
 	No_Of_Playing_Devices)
 {
 	#if defined(_WIN32) || defined(_WIN64)
-		// Ermitteln des Programmverzeichnisses
-		juce::File programDirectory = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory();
-
-		// Pfad zur Bibliothek konstruieren
-		juce::File libPath = programDirectory.getChildFile("hardsid.dll");
+		// hardsid.dll lives in Windows\System32 (the driver's install location), not next to the exe
+		juce::File systemDirectory = juce::File::getSpecialLocation(juce::File::windowsSystemDirectory);
+		juce::File libPath = systemDirectory.getChildFile("hardsid.dll");
 
 		hardsiddll = hardsidlibrary.open(libPath.getFullPathName());
-		#endif	
+		#endif
 
 		#if defined(__linux)
 		hardsiddll = hardsidlibrary.open("/usr/local/lib/libhardsid.so");
