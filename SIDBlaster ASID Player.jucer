@@ -4,7 +4,7 @@
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
               companyName="crazy-midi.de" companyWebsite="www.crazy-midi.de"
               companyEmail="info@crazy-midi.de" companyCopyright="crazy-midi.de 2024-2026"
-              headerPath="Source" version="1.1"
+              headerPath="Source" version="1.2"
               bundleIdentifier="de.crazy-midi.sidblasterasidplayer">
   <MAINGROUP id="iRcPnY" name="SIDBlaster ASID Player">
     <GROUP id="{B2ADDEAA-F2C0-E353-BBC5-F5219FB38A7C}" name="Source">

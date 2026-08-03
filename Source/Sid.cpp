@@ -24,11 +24,15 @@ playerThread(ringBuffer0,
 	No_Of_Playing_Devices)
 {
 	#if defined(_WIN32) || defined(_WIN64)
-		// hardsid.dll lives in Windows\System32 (the driver's install location), not next to the exe
-		juce::File systemDirectory = juce::File::getSpecialLocation(juce::File::windowsSystemDirectory);
-		juce::File libPath = systemDirectory.getChildFile("hardsid.dll");
+		// try next to the exe first (portable use, no driver install needed), then fall back
+		// to Windows\System32 (where the driver's own installer places it)
+		juce::File programDirectory = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory();
+		hardsiddll = hardsidlibrary.open(programDirectory.getChildFile("hardsid.dll").getFullPathName());
 
-		hardsiddll = hardsidlibrary.open(libPath.getFullPathName());
+		if (!hardsiddll) {
+			juce::File systemDirectory = juce::File::getSpecialLocation(juce::File::windowsSystemDirectory);
+			hardsiddll = hardsidlibrary.open(systemDirectory.getChildFile("hardsid.dll").getFullPathName());
+		}
 		#endif
 
 		#if defined(__linux)
